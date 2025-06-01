@@ -1,5 +1,5 @@
-# AI Proxy News Prototype
+# AI Proxy News プロトタイプ
 
-This repository contains a minimal prototype for a transparent, C2PA‑signed, AI‑assisted news workflow. The goal is to record a short interview, transcribe it with Whisper, generate a summary and follow‑up questions with GPT‑4o, sign the resulting article with C2PA, and publish it via GitHub Pages.
+このリポジトリは、透明性の高い C2PA 署名付き AI 支援ニュースワークフローの最小プロトタイプです。短いインタビューを録音し、Whisper で文字起こしを行い、GPT‑4o で要約と追加質問を生成し、C2PA で署名した記事を GitHub Pages で公開することを目指します。
 
-See `docs/design.md` for the high‑level design and `docs/workflow.md` for the step-by-step workflow.
+詳細な設計は `docs/design.md`、手順は `docs/workflow.md` を参照してください。
