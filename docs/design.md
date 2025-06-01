@@ -17,8 +17,8 @@
 ## 2. スコープ (MVP)
 
 1. **1 分間の音声インタビューを録音**（手動）
-2. Whisper ASR → `transcript.txt`（自動）
-3. GPT‑4o → *要約* + *追加質問*（自動）
+2. Google Speech-to-Text → `transcript.txt`（自動）
+3. Gemini API → *要約* + *追加質問*（自動）
 4. クレドとメタデータを追加 → `article.md`（自動）
 5. **C2PA 署名** → `article_signed.md`（自動）
 6. GitHub Pages へプッシュ → 公開 URL（手動）
@@ -39,12 +39,12 @@
 └─────────────┘                └─────┬────────┘
                                      │ run_demo.sh
                                      ▼
-                       (1) Whisper  ASR
+                       (1) Google STT
                                      ▼
                        transcript.txt
                                      │
                                      ▼
-                       (2) GPT‑4o  prompt chain
+                       (2) Gemini prompt chain
                                      ▼
                        summary.md + follow_up.md
                                      │
@@ -63,8 +63,8 @@
 | # | コンポーネント   | 技術                         | 役割                                       |
 | - | --------------- | --------------------------- | ----------------------------------------- |
 | 1 | **Credo**       | `credo.json` (5～6行)       | 編集方針を宣言し、プロンプトと C2PA マニフェストに埋め込む |
-| 2 | **ASR**         | whisper.cpp CLI            | `wav -> txt`, 言語 = ja                   |
-| 3 | **LLM チェーン** | OpenAI GPT‑4o (LangChain)  | 要約 (markdown) と 次の質問リスト          |
+| 2 | **ASR**         | Google Speech-to-Text            | `wav -> txt`, 言語 = ja                   |
+| 3 | **LLM チェーン** | Gemini API  | 要約 (markdown) と 次の質問リスト          |
 | 4 | **署名ツール**   | CAI `c2patool`             | マニフェストに credo のハッシュとソース SHA を含める |
 | 5 | **静的サイト**   | GitHub Pages               | 署名済み記事を配信                         |
 | 6 | **スクリプト**   | bash / python              | つなぎ処理; `.env` に API キーを保存        |
@@ -105,8 +105,8 @@
 credentials:
   credo_url: https://github.com/<user>/ai-proxy-news/blob/main/credo.json
   transcript_sha256: <auto-calc>
-  llm_model: gpt‑4o‑2025‑04‑preview
-  asr_model: whisper‑large‑v3
+  llm_model: gemini-pro
+  asr_model: google-speech-to-text
 ```
 
 ## 9. 手作業ステップ (v0.1)
@@ -120,15 +120,16 @@ credentials:
 
 ```bash
 # 前提: Python 3.11、ffmpeg、git
-brew install whisper-cpp ffmpeg
-pip install -r requirements.txt   # LangChain, openai, c2patool, python-dotenv
-export OPENAI_API_KEY=sk-…
+brew install ffmpeg
+pip install -r requirements.txt   # google-cloud-speech, google-generativeai, python-dotenv
+export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
+export GEMINI_API_KEY=...
 ./scripts/run_demo.sh data/record.wav
 ```
 
 ## 11. セキュリティ・コンプライアンス
 
-* API キーはローカルの `.env` にのみ保存し、決してコミットしない。
+* API キーはリポジトリのルートに置いた `.env` にのみ保存し、決してコミットしない。
 * C2PA マニフェストには **個人情報は含まない**。ハッシュと公開クレド URL のみ。
 * インタビュイーの同意を得ること（雛形は `/legal/consent_ja.md` にあり）。
 

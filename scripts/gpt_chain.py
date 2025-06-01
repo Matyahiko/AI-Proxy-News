@@ -2,7 +2,7 @@
 import os
 import sys
 import json
-import openai
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 if len(sys.argv) != 3:
@@ -10,7 +10,7 @@ if len(sys.argv) != 3:
     sys.exit(1)
 
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 transcript_path = sys.argv[1]
 output_dir = sys.argv[2]
@@ -29,11 +29,9 @@ user_msg = (
     + "\n===\n### 出力フォーマット\n#### 要約\n- ...\n#### 追加質問\n1. ...\n2. ...\n3. ..."
 )
 
-response = openai.ChatCompletion.create(
-    model="gpt-4o-2025-04-preview",
-    messages=[{"role": "system", "content": system_msg}, {"role": "user", "content": user_msg}],
-)
-content = response["choices"][0]["message"]["content"]
+model = genai.GenerativeModel("gemini-pro")
+response = model.generate_content([system_msg, user_msg])
+content = response.text
 
 summary_lines = []
 question_lines = []
