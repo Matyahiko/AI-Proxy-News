@@ -2,15 +2,15 @@
 set -euo pipefail
 
 if [ "$#" -ne 1 ]; then
-  echo "Usage: run_demo.sh <wav_file>"
+  echo "Usage: run_demo.sh <audio_file>"
   exit 1
 fi
 
-WAV="$1"
+AUDIO="$1"
 TRANSCRIPT="data/transcript.txt"
 OUTDIR="output"
 
-python3 scripts/asr.py "$WAV" "$TRANSCRIPT"
+python3 scripts/asr.py "$AUDIO" "$TRANSCRIPT"
 python3 scripts/gpt_chain.py "$TRANSCRIPT" "$OUTDIR"
 python3 scripts/sign_article.py "$OUTDIR/article.md" "$OUTDIR/article_signed.md"
 
