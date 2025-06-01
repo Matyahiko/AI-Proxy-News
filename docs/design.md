@@ -34,7 +34,7 @@
 ## 4. ハイレベルアーキテクチャ（テキスト）
 
 ```
-┌─────────────┐   record.wav   ┌──────────────┐
+┌─────────────┐   record.mp3   ┌──────────────┐
 │ mobile app  │──────────────►│   data/       │
 └─────────────┘                └─────┬────────┘
                                      │ run_demo.sh
@@ -72,7 +72,7 @@
 ## 6. データフローとファイル
 
 ```
-/data/record.wav
+/data/record.mp3 (or .wav/.mp4)
 /data/transcript.txt
 /output/summary.md
 /output/follow_up.md
@@ -111,8 +111,8 @@ credentials:
 
 ## 9. 手作業ステップ (v0.1)
 
-1. 携帯で WAV を録音し `data/` にコピー
-2. `bash scripts/run_demo.sh data/record.wav` を実行
+1. 携帯で音声を録音し `data/` にコピー（mp3/mp4/wav いずれも可）
+2. `bash scripts/run_demo.sh data/record.mp3` を実行
 3. `output/article_signed.md` を開いて軽く校正
 4. `git add docs/article_signed.md && git commit -m "first article" && git push`
 
@@ -124,7 +124,7 @@ brew install ffmpeg
 pip install -r requirements.txt   # google-cloud-speech, google-generativeai, python-dotenv
 export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
 export GEMINI_API_KEY=...
-./scripts/run_demo.sh data/record.wav
+./scripts/run_demo.sh data/record.mp3
 ```
 
 ## 11. セキュリティ・コンプライアンス
