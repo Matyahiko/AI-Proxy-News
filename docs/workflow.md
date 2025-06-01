@@ -1,15 +1,15 @@
-# Workflow
+# ワークフロー
 
-This document outlines the end-to-end process for producing a signed article using the prototype.
+このドキュメントは、プロトタイプを用いて署名済みの記事を作成するまでの流れを示します。
 
-1. **Capture audio**: record a short interview and save it as a WAV file, e.g. `data/record.wav`.
-2. **Run the demo script**: execute `./scripts/run_demo.sh data/record.wav`.
-   - This performs speech-to-text with Whisper.
-   - It then calls GPT-4o to generate a summary and follow-up questions.
-   - The resulting `article.md` is signed with C2PA.
-   - A signed copy `article_signed.md` is placed in `docs/`.
-3. **Review**: open `docs/article_signed.md` and make any edits if necessary.
-4. **Publish**: commit the file and push to GitHub. GitHub Pages will host the signed article.
+1. **音声を収録**: 短いインタビューを録音し、例として `data/record.wav` に保存します。
+2. **デモスクリプトを実行**: `./scripts/run_demo.sh data/record.wav` を実行します。
+   - Whisper で音声からテキストへ変換します。
+   - 続いて GPT‑4o で要約と追加質問を生成します。
+   - 生成された `article.md` に C2PA 署名を付与します。
+   - 署名済みファイル `article_signed.md` が `docs/` に配置されます。
+3. **確認**: `docs/article_signed.md` を開き、必要に応じて編集します。
+4. **公開**: ファイルをコミットして GitHub にプッシュすると、GitHub Pages で記事が公開されます。
 
-All intermediate files remain in `output/`. You can inspect them for transparency.
+中間ファイルはすべて `output/` に残るため、透明性を確保できます。
 

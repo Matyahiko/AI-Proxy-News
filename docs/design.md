@@ -1,37 +1,37 @@
-# AI Proxy News Prototype – Concept & Technical Design
+# AI Proxy News プロトタイプ ― 概念・技術設計
 
-## 0. Version
+## 0. バージョン
 
-* **v0.1** (2025‑06‑01) – initial draft
+* **v0.1** (2025‑06‑01) – 初版
 
 ---
 
-## 1. Purpose / Why?
+## 1. 目的 / Why?
 
-> Deliver a **transparent, C2PA‑signed, AI‑assisted news workflow** that a solo graduate student can run end‑to‑end within two weeks and show to funding/mentoring bodies.
+> 大学院生ひとりでも2週間以内に実行でき、資金提供者やメンターに示すことのできる**透明性の高い C2PA 署名付き AI 支援ニュースワークフロー**を提供する。
 
-* **Transparency** – expose editorial credo, prompts, and raw artifacts.
-* **Speed & Cost** – leverage existing cloud free tiers; manual steps accepted.
-* **Extensibility** – lay foundation for future full‑automation, RAG and API.
+* **透明性** ― クレド、プロンプト、生成物などを全て公開する。
+* **速度とコスト** ― 既存のクラウド無料枠を利用し、手動工程も許容する。
+* **拡張性** ― 将来の完全自動化や RAG、API 化へつながる基盤を作る。
 
-## 2. Scope (MVP)
+## 2. スコープ (MVP)
 
-1. Record **1‑minute audio interview** (manual).
-2. Whisper ASR → `transcript.txt` (auto).
-3. GPT‑4o → *summary* + *follow‑up questions* (auto).
-4. Append credo & metadata → `article.md` (auto).
-5. **C2PA sign** → `article_signed.md` (auto).
-6. Push to GitHub Pages → public URL (manual push).
+1. **1 分間の音声インタビューを録音**（手動）
+2. Whisper ASR → `transcript.txt`（自動）
+3. GPT‑4o → *要約* + *追加質問*（自動）
+4. クレドとメタデータを追加 → `article.md`（自動）
+5. **C2PA 署名** → `article_signed.md`（自動）
+6. GitHub Pages へプッシュ → 公開 URL（手動）
 
-## 3. User stories
+## 3. ユーザーストーリー
 
-| As a…                  | I want…                           | So that…                                              |
-| ---------------------- | --------------------------------- | ----------------------------------------------------- |
-| Graduate founder       | to show ONE signed article URL    | I can convince Osaka Innovation Hub that this is real |
-| City incubator officer | to verify provenance in one click | I can judge compliance & innovation                   |
-| Early reader           | to see full raw transcript        | I can audit trustworthiness                           |
+| 立場                 | 望むこと                              | その理由                                   |
+| -------------------- | ------------------------------------ | ------------------------------------------ |
+| 大学院生の創業者     | 1 件の署名記事の URL を示したい        | 大阪イノベーションハブに本物だと示すため   |
+| 市のインキュベータ担当 | ワンクリックで出所を確認したい        | 適合性と革新性を判断するため               |
+| 早期読者             | 生の逐語録をすべて見たい               | 信頼性を検証するため                       |
 
-## 4. High‑level architecture (textual)
+## 4. ハイレベルアーキテクチャ（テキスト）
 
 ```
 ┌─────────────┐   record.wav   ┌──────────────┐
@@ -55,21 +55,21 @@
                                      │
                           git push (manual)
                                      ▼
-                       GitHub Pages  public URL
+                       GitHub Pages  public URL
 ```
 
-## 5. Component breakdown
+## 5. コンポーネント一覧
 
-| # | Component       | Tech                        | Responsibility                                                   |
-| - | --------------- | --------------------------- | ---------------------------------------------------------------- |
-| 1 | **Credo**       | `credo.json` (5‑6 lines)    | Declares editorial values; injected into prompts & C2PA manifest |
-| 2 | **ASR**         | whisper.cpp CLI             | `wav -> txt`, language = ja                                      |
-| 3 | **LLM Chain**   | OpenAI GPT‑4o via LangChain | summary (markdown) & next‑question list                          |
-| 4 | **Signer**      | CAI `c2patool`              | embeds manifest incl. credo hash & SHA of sources                |
-| 5 | **Static site** | GitHub Pages                | serves signed article                                            |
-| 6 | **Scripts**     | bash / python               | glue logic; `.env` for API key                                   |
+| # | コンポーネント   | 技術                         | 役割                                       |
+| - | --------------- | --------------------------- | ----------------------------------------- |
+| 1 | **Credo**       | `credo.json` (5～6行)       | 編集方針を宣言し、プロンプトと C2PA マニフェストに埋め込む |
+| 2 | **ASR**         | whisper.cpp CLI            | `wav -> txt`, 言語 = ja                   |
+| 3 | **LLM チェーン** | OpenAI GPT‑4o (LangChain)  | 要約 (markdown) と 次の質問リスト          |
+| 4 | **署名ツール**   | CAI `c2patool`             | マニフェストに credo のハッシュとソース SHA を含める |
+| 5 | **静的サイト**   | GitHub Pages               | 署名済み記事を配信                         |
+| 6 | **スクリプト**   | bash / python              | つなぎ処理; `.env` に API キーを保存        |
 
-## 6. Data flow & files
+## 6. データフローとファイル
 
 ```
 /data/record.wav
@@ -82,7 +82,7 @@
                            └─ article_signed.md
 ```
 
-## 7. Prompt design (Japanese)
+## 7. プロンプト設計（日本語）
 
 ```text
 <<SYSTEM>> あなたは公共利益を最優先するAI記者です。Credo: {{credo}}
@@ -99,54 +99,53 @@
 3. ...
 ```
 
-## 8. C2PA manifest template (YAML excerpt)
+## 8. C2PA マニフェストテンプレート（YAML 抜粋）
 
 ```yaml
 credentials:
-  credo_url: https://github.com/<user>/ai‑proxy‑news/blob/main/credo.json
-  transcript_sha256: <auto‑calc>
+  credo_url: https://github.com/<user>/ai-proxy-news/blob/main/credo.json
+  transcript_sha256: <auto-calc>
   llm_model: gpt‑4o‑2025‑04‑preview
   asr_model: whisper‑large‑v3
 ```
 
-## 9. Manual steps (v0.1)
+## 9. 手作業ステップ (v0.1)
 
-1. Record WAV (phone) & copy to `data/`.
-2. Run `bash scripts/run_demo.sh data/record.wav`.
-3. Open `output/article_signed.md` → quick proofread.
-4. `git add docs/article_signed.md && git commit -m "first article" && git push`.
+1. 携帯で WAV を録音し `data/` にコピー
+2. `bash scripts/run_demo.sh data/record.wav` を実行
+3. `output/article_signed.md` を開いて軽く校正
+4. `git add docs/article_signed.md && git commit -m "first article" && git push`
 
-## 10. Local setup
+## 10. ローカル環境構築
 
 ```bash
-# Prereq: Python 3.11, ffmpeg, git
-brew install whisper‑cpp ffmpeg
-pip install -r requirements.txt   # LangChain, openai, c2patool, python‑dotenv
-export OPENAI_API_KEY=sk‑…
+# 前提: Python 3.11、ffmpeg、git
+brew install whisper-cpp ffmpeg
+pip install -r requirements.txt   # LangChain, openai, c2patool, python-dotenv
+export OPENAI_API_KEY=sk-…
 ./scripts/run_demo.sh data/record.wav
 ```
 
-## 11. Security / compliance notes
+## 11. セキュリティ・コンプライアンス
 
-* Store API key only in local `.env`; never commit.
-* C2PA manifest contains **no personal data**; only hashes & public credo URL.
-* Interviewee must consent to recording (template in `/legal/consent_ja.md`).
+* API キーはローカルの `.env` にのみ保存し、決してコミットしない。
+* C2PA マニフェストには **個人情報は含まない**。ハッシュと公開クレド URL のみ。
+* インタビュイーの同意を得ること（雛形は `/legal/consent_ja.md` にあり）。
 
-## 12. Future backlog
+## 12. 今後の予定
 
-1. **Streamlit signer GUI** – eliminate CLI friction.
-2. **RAG contextualiser** – inject local gov docs into prompt.
-3. **Remote execution** – GitHub Actions CI to auto‑sign & deploy.
-4. **Multi‑modal** – add image capture + C2PA sidecar.
+1. **Streamlit 署名 GUI** ― CLI の手間を排除
+2. **RAG コンテクスチュアライザー** ― ローカル自治体資料をプロンプトに注入
+3. **リモート実行** ― GitHub Actions で自動署名・デプロイ
+4. **マルチモーダル** ― 画像キャプチャ + C2PA サイドカー追加
 
-## 13. Review checklist (for mentors)
+## 13. レビュー用チェックリスト（メンター向け）
 
-* [ ] Can run end‑to‑end offline?
-* [ ] Credo ‑> manifest hash verified?
-* [ ] Output readable on mobile?
-* [ ] Interviewee consent collected?
+* [ ] オフラインで一連の流れを実行できるか
+* [ ] Credo → マニフェストのハッシュ検証済みか
+* [ ] モバイルで表示が読みやすいか
+* [ ] インタビュイーの同意を取得したか
 
 ---
 
-### End of v0.1 design
-
+### v0.1 設計書 終わり
