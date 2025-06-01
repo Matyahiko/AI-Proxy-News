@@ -15,7 +15,7 @@ API キーを含む `.env` ファイルはリポジトリのルートに配置�
 docker build -t ai-proxy-news .
 ```
 
-3. 音声ファイル `data/record.wav` を用意し、次を実行してデモを開始します。
+3. 音声ファイル `data/record.wav` や `data/record.mp3` などを用意し、次を実行してデモを開始します。
 
 ```bash
 docker run --rm -it \
@@ -23,7 +23,7 @@ docker run --rm -it \
   -v $(pwd)/output:/app/output \
   -v $(pwd)/docs:/app/docs \
   --env-file .env \
-  ai-proxy-news bash scripts/run_demo.sh data/record.wav
+  ai-proxy-news bash scripts/run_demo.sh data/record.mp3
 ```
 
 生成された `docs/article_signed.md` をコミットして GitHub Pages へ公開してください。
