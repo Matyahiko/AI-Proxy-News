@@ -14,3 +14,6 @@ if [ -n "$PROXY" ]; then
 else
   docker build -t "$IMAGE_NAME" "$SCRIPT_DIR/.."
 fi
+
+# Install Python dependencies locally after building the image
+python3 -m pip install -r "$SCRIPT_DIR/../requirements.txt"
