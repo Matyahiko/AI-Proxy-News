@@ -39,6 +39,8 @@
 └─────────────┘                └─────┬────────┘
                                      │ run_demo.sh
                                      ▼
+                       upload to GCS
+                                     ▼
                        (1) Google STT
                                      ▼
                        transcript.txt
@@ -73,6 +75,7 @@
 
 ```
 /data/record.mp3 (or .wav/.mp4)
+gs://<bucket>/record.wav
 /data/transcript.txt
 /output/summary.md
 /output/follow_up.md
@@ -113,6 +116,7 @@ credentials:
 
 1. 携帯で音声を録音し `data/` にコピー（mp3/mp4/wav いずれも可）
 2. `bash scripts/run_demo.sh data/record.mp3` を実行
+   - 音声は Google Cloud Storage にアップロードされ、URI 指定で音声認識が行われます。
 3. `output/article_signed.md` を開いて軽く校正
 4. `git add docs/article_signed.md && git commit -m "first article" && git push`
 
@@ -121,9 +125,10 @@ credentials:
 ```bash
 # 前提: Python 3.11、ffmpeg、git
 brew install ffmpeg
-pip install -r requirements.txt   # google-cloud-speech, google-generativeai, python-dotenv
+pip install -r requirements.txt   # google-cloud-speech, google-generativeai, python-dotenv, google-cloud-storage
 export GOOGLE_APPLICATION_CREDENTIALS=secrets/credentials.json
 export GEMINI_API_KEY=...
+export GCS_BUCKET=<your-bucket>
 ./scripts/run_demo.sh data/record.mp3
 ```
 

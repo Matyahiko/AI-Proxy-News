@@ -3,10 +3,16 @@ import sys
 import os
 import subprocess
 import tempfile
+import uuid
 from dotenv import load_dotenv
-from google.cloud import speech
+from google.cloud import speech, storage
 
 load_dotenv(os.path.join("secrets", ".env"))
+
+bucket_name = os.getenv("GCS_BUCKET")
+if not bucket_name:
+    print("Error: GCS_BUCKET not set in environment")
+    sys.exit(1)
 
 if len(sys.argv) != 3:
     print("Usage: asr.py <audio_path> <output_txt>")
@@ -38,21 +44,27 @@ if not src_path.lower().endswith(".wav"):
     use_path = convert_to_wav(src_path)
     cleanup = True
 
-client = speech.SpeechClient()
+speech_client = speech.SpeechClient()
+storage_client = storage.Client()
 
-with open(use_path, "rb") as audio_file:
-    audio_content = audio_file.read()
+bucket = storage_client.bucket(bucket_name)
+blob_name = f"audio/{uuid.uuid4()}.wav"
+blob = bucket.blob(blob_name)
+blob.upload_from_filename(use_path)
+gcs_uri = f"gs://{bucket_name}/{blob_name}"
 
-audio = speech.RecognitionAudio(content=audio_content)
+audio = speech.RecognitionAudio(uri=gcs_uri)
 config = speech.RecognitionConfig(
     encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
     language_code="ja-JP",
 )
 
 # Use long-running recognition for better handling of long audio files
-operation = client.long_running_recognize(config=config, audio=audio)
+operation = speech_client.long_running_recognize(config=config, audio=audio)
 response = operation.result(timeout=600)
 text = "".join(result.alternatives[0].transcript for result in response.results)
+
+blob.delete()  # cleanup uploaded file
 
 if cleanup:
     os.remove(use_path)

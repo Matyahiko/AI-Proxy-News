@@ -4,7 +4,7 @@
 
 1. **音声を収録**: 短いインタビューを録音し、例として `data/record.mp3` などに保存します。
 2. **デモスクリプトを実行**: `./scripts/run_demo.sh data/record.mp3` を実行します。
-   - Google Speech-to-Text の長時間音声用 API で音声からテキストへ変換します。
+   - 音声ファイルを Google Cloud Storage にアップロードし、URI を指定して Google Speech-to-Text の長時間音声用 API でテキストへ変換します。
    - 続いて Gemini API で要約と追加質問を生成します。
    - 生成された `article.md` に C2PA 署名を付与します。
    - 署名済みファイル `article_signed.md` が `docs/` に配置されます。
