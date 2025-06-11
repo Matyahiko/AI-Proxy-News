@@ -34,6 +34,9 @@ model = genai.GenerativeModel("gemini-2.5-pro-preview-06-05")
 response = model.generate_content([system_msg, user_msg])
 content = response.text
 
+with open(os.path.join(output_dir, "raw_gpt_output.md"), "w", encoding="utf-8") as f:
+    f.write(content)
+
 summary_lines = []
 question_lines = []
 section = None
@@ -60,4 +63,6 @@ with open(os.path.join(output_dir, "article.md"), "w", encoding="utf-8") as f:
     f.write("\n".join(summary_lines).strip() + "\n\n")
     f.write("## 追加質問\n")
     f.write("\n".join(question_lines).strip() + "\n")
+if not summary_lines or not question_lines:
+    print("[GPT] Warning: unable to parse expected sections. See raw_gpt_output.md for details")
 print(f"[GPT] Generated article files in '{output_dir}'")
