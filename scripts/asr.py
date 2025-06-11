@@ -14,6 +14,7 @@ if len(sys.argv) != 3:
 
 src_path = sys.argv[1]
 output_path = sys.argv[2]
+print(f"[ASR] Transcribing '{src_path}'...")
 
 def convert_to_wav(path: str) -> str:
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
@@ -56,3 +57,4 @@ if cleanup:
 
 with open(output_path, "w", encoding="utf-8") as f:
     f.write(text.strip() + "\n")
+print(f"[ASR] Transcript saved to '{output_path}'")
