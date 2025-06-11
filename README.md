@@ -18,8 +18,14 @@ bash scripts/build_image.sh
 # 例: プロキシを指定して直接ビルドする場合
 docker build --build-arg PROXY=http://example.com:8080 -t ai-proxy-news .
 ```
+3. 任意で Gemini の利用可能なモデルを確認します。
 
-3. 音声ファイル `data/record.wav` や `data/record.mp3` などを用意し、次を実行してデモを開始します。音声は Google Cloud Storage にアップロードされ、URI で認識されます。
+```bash
+python3 scripts/list_models.py
+```
+
+
+4. 音声ファイル `data/record.wav` や `data/record.mp3` などを用意し、次を実行してデモを開始します。音声は Google Cloud Storage にアップロードされ、URI で認識されます。
 
 ```bash
 docker run --rm -it \
