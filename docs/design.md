@@ -8,7 +8,7 @@
 
 ## 1. 目的 / Why?
 
-> 大学院生ひとりでも2週間以内に実行でき、資金提供者やメンターに示すことのできる**透明性の高い C2PA 署名付き AI 支援ニュースワークフロー**を提供する。
+> 大学院生ひとりでも2週間以内に実行でき、資金提供者やメンターに示すことのできる**透明性の高い AI 支援ニュースワークフロー**を提供する。
 
 * **透明性** ― クレド、プロンプト、生成物などを全て公開する。
 * **速度とコスト** ― 既存のクラウド無料枠を利用し、手動工程も許容する。
@@ -20,8 +20,7 @@
 2. Google Speech-to-Text の長時間音声用 API → `transcript.txt`（自動）
 3. Gemini API → *要約* + *追加質問*（自動）
 4. クレドとメタデータを追加 → `article.md`（自動）
-5. **C2PA 署名** → `article_signed.md`（自動）
-6. GitHub Pages へプッシュ → 公開 URL（手動）
+5. GitHub Pages へプッシュ → 公開 URL（手動）
 
 ## 3. ユーザーストーリー
 
@@ -49,11 +48,8 @@
                        (2) Gemini prompt chain
                                      ▼
                        summary.md + follow_up.md
-                                     │
                                      ▼
-                       (3) C2PA sign (c2patool)
-                                     ▼
-                       article_signed.md
+                       article.md
                                      │
                           git push (manual)
                                      ▼
@@ -64,12 +60,11 @@
 
 | # | コンポーネント   | 技術                         | 役割                                       |
 | - | --------------- | --------------------------- | ----------------------------------------- |
-| 1 | **Credo**       | `credo.json` (5～6行)       | 編集方針を宣言し、プロンプトと C2PA マニフェストに埋め込む |
+| 1 | **Credo**       | `credo.json` (5～6行)       | 編集方針を宣言し、プロンプトに埋め込む |
 | 2 | **ASR**         | Google Speech-to-Text (長時間音声用 API)            | `wav -> txt`, 言語 = ja                   |
 | 3 | **LLM チェーン** | Gemini API  | 要約 (markdown) と 次の質問リスト          |
-| 4 | **署名ツール**   | CAI `c2patool`             | マニフェストに credo のハッシュとソース SHA を含める |
-| 5 | **静的サイト**   | GitHub Pages               | 署名済み記事を配信                         |
-| 6 | **スクリプト**   | bash / python              | つなぎ処理; `secrets/.env` に API キーを保存 |
+| 4 | **静的サイト**   | GitHub Pages               | 記事を配信                         |
+| 5 | **スクリプト**   | bash / python              | つなぎ処理; `secrets/.env` に API キーを保存 |
 
 ## 6. データフローとファイル
 
@@ -80,9 +75,8 @@ gs://<bucket>/record.wav
 /output/summary.md
 /output/follow_up.md
 /output/article.md           (summary + Qs + appendix)
-/output/article_signed.md    (C2PA)
 /docs/ (gh‑pages branch) ──┐
-                           └─ article_signed.md
+                           └─ article.md
 ```
 
 ## 7. プロンプト設計（日本語）
@@ -102,23 +96,13 @@ gs://<bucket>/record.wav
 3. ...
 ```
 
-## 8. C2PA マニフェストテンプレート（YAML 抜粋）
-
-```yaml
-credentials:
-  credo_url: https://github.com/<user>/ai-proxy-news/blob/main/credo.json
-  transcript_sha256: <auto-calc>
-  llm_model: gemini-2.5-pro-preview-06-05
-  asr_model: google-speech-to-text
-```
-
-## 9. 手作業ステップ (v0.1)
+## 8. 手作業ステップ (v0.1)
 
 1. 携帯で音声を録音し `data/` にコピー（mp3/mp4/wav いずれも可）
 2. `bash scripts/run_demo.sh data/record.mp3` を実行
    - 音声は Google Cloud Storage にアップロードされ、URI 指定で音声認識が行われます。
-3. `output/article_signed.md` を開いて軽く校正
-4. `git add docs/article_signed.md && git commit -m "first article" && git push`
+3. `output/article.md` を開いて軽く校正
+4. `git add docs/article.md && git commit -m "first article" && git push`
 
 ## 10. ローカル環境構築
 
@@ -135,20 +119,15 @@ export GCS_BUCKET=<your-bucket>
 ## 11. セキュリティ・コンプライアンス
 
 * API キーは `secrets/.env` のみに保存し、決してコミットしない。
-* C2PA マニフェストには **個人情報は含まない**。ハッシュと公開クレド URL のみ。
 * インタビュイーの同意を得ること（雛形は `/legal/consent_ja.md` にあり）。
 
 ## 12. 今後の予定
 
-1. **Streamlit 署名 GUI** ― CLI の手間を排除
-2. **RAG コンテクスチュアライザー** ― ローカル自治体資料をプロンプトに注入
-3. **リモート実行** ― GitHub Actions で自動署名・デプロイ
-4. **マルチモーダル** ― 画像キャプチャ + C2PA サイドカー追加
+1. **RAG コンテクスチュアライザー** ― ローカル自治体資料をプロンプトに注入
 
 ## 13. レビュー用チェックリスト（メンター向け）
 
 * [ ] オフラインで一連の流れを実行できるか
-* [ ] Credo → マニフェストのハッシュ検証済みか
 * [ ] モバイルで表示が読みやすいか
 * [ ] インタビュイーの同意を取得したか
 
