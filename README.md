@@ -10,10 +10,13 @@ API キーなどの認証情報は `secrets/.env` にまとめて保存してく
 
 1. `.env.example` を参考に `secrets/.env` を作成し、API キーを記入します。
 2. 以下のコマンドでイメージをビルドします。 `secrets/.env` に `PROXY` を設定す
-ると自動で利用されます。
+   ると自動で利用されます。`docker build` だけでビルドする場合は
+   `--build-arg PROXY=<proxy-url>` を渡してください。
 
 ```bash
 bash scripts/build_image.sh
+# 例: プロキシを指定して直接ビルドする場合
+docker build --build-arg PROXY=http://example.com:8080 -t ai-proxy-news .
 ```
 
 3. 音声ファイル `data/record.wav` や `data/record.mp3` などを用意し、次を実行してデモを開始します。
