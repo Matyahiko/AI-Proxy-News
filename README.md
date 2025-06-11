@@ -23,9 +23,7 @@ docker build --build-arg PROXY=http://example.com:8080 -t ai-proxy-news .
 
 ```bash
 docker run --rm -it \
-  -v $(pwd)/data:/app/data \
-  -v $(pwd)/output:/app/output \
-  -v $(pwd)/docs:/app/docs \
+  -v $(pwd):/app \
   --env-file secrets/.env \
   ai-proxy-news bash scripts/run_demo.sh data/record.mp3
 ```
