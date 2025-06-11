@@ -67,7 +67,7 @@
 | 3 | **LLM チェーン** | Gemini API  | 要約 (markdown) と 次の質問リスト          |
 | 4 | **署名ツール**   | CAI `c2patool`             | マニフェストに credo のハッシュとソース SHA を含める |
 | 5 | **静的サイト**   | GitHub Pages               | 署名済み記事を配信                         |
-| 6 | **スクリプト**   | bash / python              | つなぎ処理; `.env` に API キーを保存        |
+| 6 | **スクリプト**   | bash / python              | つなぎ処理; `secrets/.env` に API キーを保存 |
 
 ## 6. データフローとファイル
 
@@ -122,14 +122,14 @@ credentials:
 # 前提: Python 3.11、ffmpeg、git
 brew install ffmpeg
 pip install -r requirements.txt   # google-cloud-speech, google-generativeai, python-dotenv
-export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
+export GOOGLE_APPLICATION_CREDENTIALS=secrets/credentials.json
 export GEMINI_API_KEY=...
 ./scripts/run_demo.sh data/record.mp3
 ```
 
 ## 11. セキュリティ・コンプライアンス
 
-* API キーはリポジトリのルートに置いた `.env` にのみ保存し、決してコミットしない。
+* API キーは `secrets/.env` のみに保存し、決してコミットしない。
 * C2PA マニフェストには **個人情報は含まない**。ハッシュと公開クレド URL のみ。
 * インタビュイーの同意を得ること（雛形は `/legal/consent_ja.md` にあり）。
 

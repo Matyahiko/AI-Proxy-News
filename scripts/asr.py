@@ -6,7 +6,7 @@ import tempfile
 from dotenv import load_dotenv
 from google.cloud import speech
 
-load_dotenv()
+load_dotenv(os.path.join("secrets", ".env"))
 
 if len(sys.argv) != 3:
     print("Usage: asr.py <audio_path> <output_txt>")

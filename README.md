@@ -4,11 +4,11 @@
 
 詳細な設計は `docs/design.md`、手順は `docs/workflow.md` を参照してください。
 
-API キーを含む `.env` ファイルはリポジトリのルートに配置してください。
+API キーなどの認証情報は `secrets/.env` にまとめて保存してください。
 
 ## Docker での実行
 
-1. `.env.example` を参考に API キーを記入した `.env` を作成します。
+1. `.env.example` を参考に `secrets/.env` を作成し、API キーを記入します。
 2. 以下のコマンドでイメージをビルドします。
 
 ```bash
@@ -22,7 +22,7 @@ docker run --rm -it \
   -v $(pwd)/data:/app/data \
   -v $(pwd)/output:/app/output \
   -v $(pwd)/docs:/app/docs \
-  --env-file .env \
+  --env-file secrets/.env \
   ai-proxy-news bash scripts/run_demo.sh data/record.mp3
 ```
 

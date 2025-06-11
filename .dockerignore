@@ -3,6 +3,7 @@ output/
 data/
 .env
 .env.*
+secrets/
 .git
 .gitignore
 .DS_Store
