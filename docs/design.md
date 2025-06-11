@@ -17,7 +17,7 @@
 ## 2. スコープ (MVP)
 
 1. **1 分間の音声インタビューを録音**（手動）
-2. Google Speech-to-Text → `transcript.txt`（自動）
+2. Google Speech-to-Text の長時間音声用 API → `transcript.txt`（自動）
 3. Gemini API → *要約* + *追加質問*（自動）
 4. クレドとメタデータを追加 → `article.md`（自動）
 5. **C2PA 署名** → `article_signed.md`（自動）
@@ -63,7 +63,7 @@
 | # | コンポーネント   | 技術                         | 役割                                       |
 | - | --------------- | --------------------------- | ----------------------------------------- |
 | 1 | **Credo**       | `credo.json` (5～6行)       | 編集方針を宣言し、プロンプトと C2PA マニフェストに埋め込む |
-| 2 | **ASR**         | Google Speech-to-Text            | `wav -> txt`, 言語 = ja                   |
+| 2 | **ASR**         | Google Speech-to-Text (長時間音声用 API)            | `wav -> txt`, 言語 = ja                   |
 | 3 | **LLM チェーン** | Gemini API  | 要約 (markdown) と 次の質問リスト          |
 | 4 | **署名ツール**   | CAI `c2patool`             | マニフェストに credo のハッシュとソース SHA を含める |
 | 5 | **静的サイト**   | GitHub Pages               | 署名済み記事を配信                         |
