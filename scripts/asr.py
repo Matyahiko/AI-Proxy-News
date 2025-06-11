@@ -49,7 +49,9 @@ config = speech.RecognitionConfig(
     language_code="ja-JP",
 )
 
-response = client.recognize(config=config, audio=audio)
+# Use long-running recognition for better handling of long audio files
+operation = client.long_running_recognize(config=config, audio=audio)
+response = operation.result(timeout=600)
 text = "".join(result.alternatives[0].transcript for result in response.results)
 
 if cleanup:
