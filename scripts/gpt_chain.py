@@ -30,7 +30,7 @@ user_msg = (
     + "\n===\n### 出力フォーマット\n#### 要約\n- ...\n#### 追加質問\n1. ...\n2. ...\n3. ..."
 )
 
-model = genai.GenerativeModel("gemini-pro")
+model = genai.GenerativeModel("gemini-2.5-pro-preview-06-05")
 response = model.generate_content([system_msg, user_msg])
 content = response.text
 

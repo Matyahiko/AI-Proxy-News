@@ -26,7 +26,7 @@ manifest = {
     "credentials": {
         "credo_url": "https://github.com/<user>/ai-proxy-news/blob/main/credo.json",
         "transcript_sha256": article_hash,
-        "llm_model": "gemini-pro",
+        "llm_model": "gemini-2.5-pro-preview-06-05",
         "asr_model": "google-speech-to-text",
     },
     "cred_hash": credo_hash,
