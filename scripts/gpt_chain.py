@@ -9,7 +9,7 @@ if len(sys.argv) != 3:
     print("Usage: gpt_chain.py <transcript_txt> <output_dir>")
     sys.exit(1)
 
-load_dotenv()
+load_dotenv(os.path.join("secrets", ".env"))
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 transcript_path = sys.argv[1]
