@@ -12,6 +12,7 @@ if len(sys.argv) != 3:
 article = sys.argv[1]
 signed = sys.argv[2]
 os.makedirs(os.path.dirname(signed), exist_ok=True)
+print(f"[SIGN] Signing article '{article}'...")
 
 with open("credo.json", "rb") as f:
     credo_bytes = f.read()
@@ -37,5 +38,4 @@ with open(manifest_path, "w", encoding="utf-8") as f:
 
 cmd = ["c2patool", article, signed, "--manifest", manifest_path]
 subprocess.run(cmd, check=False)
-
-print("Signed article written to", signed)
+print(f"[SIGN] Signed article written to '{signed}'")

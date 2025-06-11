@@ -15,6 +15,7 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 transcript_path = sys.argv[1]
 output_dir = sys.argv[2]
 os.makedirs(output_dir, exist_ok=True)
+print(f"[GPT] Processing transcript '{transcript_path}'...")
 
 with open("credo.json", encoding="utf-8") as f:
     credo = json.load(f)
@@ -59,3 +60,4 @@ with open(os.path.join(output_dir, "article.md"), "w", encoding="utf-8") as f:
     f.write("\n".join(summary_lines).strip() + "\n\n")
     f.write("## 追加質問\n")
     f.write("\n".join(question_lines).strip() + "\n")
+print(f"[GPT] Generated article files in '{output_dir}'")
