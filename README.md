@@ -38,9 +38,10 @@ docker run --rm -it \
 
 ## ローカルでデモサイトを表示する
 
-`docs/site/` ディレクトリには、インタビュー動画のサンプルを使ったデモサイト
-(`demo.html`) が含まれています。以下のスクリプトで簡易 HTTP サーバーを起動し、
-ブラウザで `http://localhost:8000/demo.html` を開いて確認できます。
+`docs/site/` ディレクトリにはデモ用の `demo.html` が含まれています。
+`scripts/serve_docs.sh` を実行すると、プロジェクトルートの `data/` ディレクトリ
+にある動画ファイルを自動で読み込み、簡易 HTTP サーバーを起動します。ブラウザで
+`http://localhost:8000/demo.html` を開いて確認できます。
 
 ```bash
 bash scripts/serve_docs.sh [ポート番号]
