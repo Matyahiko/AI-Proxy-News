@@ -60,3 +60,17 @@ python3 scripts/realtime_server.py
 ```
 
 `ASR_PORT` 環境変数で待ち受けポートを変更できます。
+
+#### Docker コンテナで同時に起動する
+
+HTTP サーバーとリアルタイム文字起こしサーバーを一度に立ち上げたい場合は、
+`scripts/run_realtime_demo.sh` を実行します。ポート `8000` と `8765` を開けておくと、
+ブラウザから <http://localhost:8000/demo.html> にアクセスできます。
+
+```bash
+docker run --rm -it \
+  -p 8000:8000 -p 8765:8765 \
+  -v $(pwd):/app \
+  --env-file secrets/.env \
+  ai-proxy-news bash scripts/run_realtime_demo.sh
+```
