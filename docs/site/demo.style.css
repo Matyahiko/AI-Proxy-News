@@ -2,6 +2,24 @@
     display: flex;
     gap: 1rem;
 }
+
+body {
+    font-family: sans-serif;
+    margin: 1rem;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.tab-panel {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    min-height: 300px;
+}
 #left-column {
     flex: 1;
 }
@@ -30,4 +48,21 @@
 [disabled] {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+/* Dark theme */
+body.dark {
+    background-color: #222;
+    color: #eee;
+}
+body.dark button {
+    color: #eee;
+}
+body.dark .video-selector.active,
+body.dark .tab-button.active {
+    background-color: #446;
+}
+body.dark .current-transcript {
+    background-color: #f90;
+    color: #000;
 }

@@ -4,6 +4,13 @@ let questionsShown = new Set();
 window.addEventListener('DOMContentLoaded', () => {
     const video = document.getElementById('video-player');
     const btnContainer = document.getElementById('video-buttons');
+    const themeToggle = document.getElementById('theme-toggle');
+
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        themeToggle.textContent =
+            document.body.classList.contains('dark') ? 'ライトモード' : 'ダークモード';
+    });
 
     fetch('assets/data/video_list.json')
         .then(r => r.json())
@@ -103,7 +110,8 @@ function setupDemo(data) {
         data.questions.forEach((q, idx) => {
             if (current >= q.timestamp && !questionsShown.has(idx)) {
                 const li = document.createElement('li');
-                li.textContent = q.question;
+                const timeStr = new Date(q.timestamp * 1000).toISOString().substr(14, 5);
+                li.textContent = `[${timeStr}] ${q.question}`;
                 li.addEventListener('click', () => {
                     video.currentTime = q.timestamp;
                 });
