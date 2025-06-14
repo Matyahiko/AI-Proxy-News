@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>AI-Proxy-News デモ</title>
+    <link rel="stylesheet" href="demo.style.css">
+</head>
+<body>
+<header><h1>AI-Proxy-News - AIによるインタビュー記事作成デモ</h1></header>
+<section id="control-area">
+    <p>デモ動画を選択:</p>
+    <button id="btn-kaiken" class="video-selector active" data-src="/assets/data/kaiken.json">記者会見 (3分)</button>
+    <button id="btn-interview" class="video-selector" data-src="/assets/data/interview.json">インタビュー (1分)</button>
+</section>
+<main id="main-content">
+    <div id="left-column">
+        <video id="video-player" controls></video>
+    </div>
+    <div id="right-column">
+        <nav id="tab-nav">
+            <button id="tab-realtime" class="tab-button active" data-target="panel-realtime">リアルタイム分析</button>
+            <button id="tab-mock" class="tab-button" data-target="panel-mock">記事生成ステップ(モック)</button>
+        </nav>
+        <div id="panel-realtime" class="tab-panel active">
+            <h3>リアルタイム文字起こし</h3>
+            <div id="transcript-area"></div>
+            <hr>
+            <h3>AIによる生成質問</h3>
+            <ul id="questions-list"></ul>
+        </div>
+        <div id="panel-mock" class="tab-panel">
+            <p>[Step 1] AIがインタビューから質問を抽出しました。</p>
+            <p>[Step 2] 各質問に対する回答や補足情報を入力してください。</p>
+            <div id="mock-questions-area"></div>
+            <p>[Step 3] 入力された情報をもとに記事を生成します。</p>
+            <button disabled>この記事案をAIに生成させる</button>
+        </div>
+    </div>
+</main>
+<script src="demo.script.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+#main-content {
+    display: flex;
+    gap: 1rem;
+}
+#left-column {
+    flex: 1;
+}
+#right-column {
+    flex: 1;
+}
+.video-selector.active,
+.tab-button.active {
+    background-color: #cee;
+}
+.current-transcript {
+    background-color: yellow;
+    color: black;
+}
+#questions-list {
+    list-style: none;
+    padding: 0;
+}
+#questions-list li {
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

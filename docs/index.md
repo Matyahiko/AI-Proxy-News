@@ -4,4 +4,5 @@
 
 * [設計](design.md)
 * [ワークフロー](workflow.md)
+* [デモサイト](demo.html)
 * [最新の記事](article.md)
