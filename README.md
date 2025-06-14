@@ -72,3 +72,13 @@ bash scripts/start_realtime_demo.sh
 ```
 
 終了すると両方のサーバーが停止します。
+
+Docker コンテナ内で実行する場合の例:
+
+```bash
+docker run --rm -it \
+  -p 8000:8000 \
+  -v $(pwd):/app \
+  --env-file secrets/.env \
+  ai-proxy-news bash scripts/start_realtime_demo.sh
+```

@@ -28,8 +28,12 @@ echo "Serving demo site on http://localhost:${PORT}/demo.html"
 python3 -m http.server "$PORT" &
 SERVER_PID=$!
 sleep 1
-python3 - <<EOF
+
+if [ -z "${HEADLESS:-}" ]; then
+  python3 - <<EOF
 import webbrowser
 webbrowser.open(f"http://localhost:${PORT}/demo.html")
 EOF
+fi
+
 wait $SERVER_PID
