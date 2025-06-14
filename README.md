@@ -41,13 +41,13 @@ docker run --rm -it \
 `docs/site/` ディレクトリにはデモ用の `demo.html` が含まれています。
 `scripts/serve_docs.sh` を実行すると、プロジェクトルートの `data/` ディレクトリ
 にある動画ファイルを自動で読み込み、簡易 HTTP サーバーを起動します。ブラウザで
-`http://localhost:8000/demo.html` を開いて確認できます。
+`http://localhost:8080/demo.html` を開いて確認できます。
 
 ```bash
 bash scripts/serve_docs.sh [ポート番号]
 ```
 
-ポート番号を省略すると `8000` で起動します。
+ポート番号を省略すると `8080` で起動します。
 
 ### リアルタイム文字起こしを試す
 
@@ -64,13 +64,13 @@ python3 scripts/realtime_server.py
 #### Docker コンテナで同時に起動する
 
 HTTP サーバーとリアルタイム文字起こしサーバーを一度に立ち上げたい場合は、
-`scripts/run_realtime_demo.sh` を実行します。デフォルトではポート `8000` と
-`8765` を使用しますが、引数で変更可能です。ポートを開けておくとブラウザから
-<http://localhost:8000/demo.html> にアクセスできます。
+`scripts/run_realtime_demo.sh` を実行します。デフォルトではポート `8080` と
+`9000` を使用しますが、引数で変更可能です。ポートを開けておくとブラウザから
+<http://localhost:8080/demo.html> にアクセスできます。
 
 ```bash
 docker run --rm -it \
-  -p 8000:8000 -p 8765:8765 \
+  -p 8080:8080 -p 9000:9000 \
   -v $(pwd):/app \
   --env-file secrets/.env \
   ai-proxy-news bash scripts/run_realtime_demo.sh
@@ -80,8 +80,8 @@ docker run --rm -it \
 
 ```bash
 docker run --rm -it \
-  -p 8080:8080 -p 9000:9000 \
+  -p 8000:8000 -p 8765:8765 \
   -v $(pwd):/app \
   --env-file secrets/.env \
-  ai-proxy-news bash scripts/run_realtime_demo.sh 8080 9000
+  ai-proxy-news bash scripts/run_realtime_demo.sh 8000 8765
 ```

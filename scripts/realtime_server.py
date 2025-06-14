@@ -9,7 +9,7 @@ import websockets
 
 load_dotenv(os.path.join('secrets', '.env'))
 
-PORT = int(os.environ.get('ASR_PORT', '8765'))
+PORT = int(os.environ.get('ASR_PORT', '9000'))
 
 async def handle(websocket):
     client = speech.SpeechClient()
