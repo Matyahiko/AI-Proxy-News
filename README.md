@@ -60,3 +60,15 @@ python3 scripts/realtime_server.py
 ```
 
 `ASR_PORT` 環境変数で待ち受けポートを変更できます。
+
+### まとめて実行する
+
+リアルタイムサーバーとデモサイトを同時に起動するスクリプト
+`scripts/start_realtime_demo.sh` を用意しています。仮想環境が自動で作成され、
+依存パッケージのインストールからサーバー起動までを一括で行います。
+
+```bash
+bash scripts/start_realtime_demo.sh
+```
+
+終了すると両方のサーバーが停止します。
