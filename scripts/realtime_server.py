@@ -27,7 +27,6 @@ async def handle(websocket):
     loop = asyncio.get_event_loop()
 
     def request_gen():
-        yield speech.StreamingRecognizeRequest(streaming_config=streaming_config)
         while True:
             data = q.get()
             if data is None:
@@ -46,7 +45,10 @@ async def handle(websocket):
             q.put(None)
 
     def process():
-        responses = client.streaming_recognize(request_gen())
+        responses = client.streaming_recognize(
+            config=streaming_config,
+            requests=request_gen(),
+        )
         for response in responses:
             for result in response.results:
                 if not result.alternatives:
