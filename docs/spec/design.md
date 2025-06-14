@@ -20,7 +20,7 @@
 2. Google Speech-to-Text の長時間音声用 API → `transcript.txt`（自動）
 3. Gemini API → *要約* + *追加質問*（自動）
 4. クレドとメタデータを追加 → `article.md`（自動）
-5. GitHub Pages へプッシュ → 公開 URL（手動）
+5. `docs/site/` に生成物を保存 → 任意の方法で公開（手動）
 
 ## 3. ユーザーストーリー
 
@@ -51,9 +51,9 @@
                                      ▼
                        article.md
                                      │
-                          git push (manual)
+                          upload (manual)
                                      ▼
-                       GitHub Pages  public URL
+                       static site public URL
 ```
 
 ## 5. コンポーネント一覧
@@ -63,7 +63,7 @@
 | 1 | **Credo**       | `credo.json` (5～6行)       | 編集方針を宣言し、プロンプトに埋め込む |
 | 2 | **ASR**         | Google Speech-to-Text (長時間音声用 API)            | `wav -> txt`, 言語 = ja                   |
 | 3 | **LLM チェーン** | Gemini API  | 要約 (markdown) と 次の質問リスト          |
-| 4 | **静的サイト**   | GitHub Pages               | 記事を配信                         |
+| 4 | **静的サイト**   | 任意のホスティング               | 記事を配信                         |
 | 5 | **スクリプト**   | bash / python              | つなぎ処理; `secrets/.env` に API キーを保存 |
 
 ## 6. データフローとファイル
@@ -75,7 +75,7 @@ gs://<bucket>/record.wav
 /output/summary.md
 /output/follow_up.md
 /output/article.md           (summary + Qs + appendix)
-/docs/site/ (gh‑pages branch) ──┐
+/docs/site/ (static site dir) ──┐
                                 └─ article.md
 ```
 
@@ -102,7 +102,7 @@ gs://<bucket>/record.wav
 2. `bash scripts/run_demo.sh data/record.mp3` を実行
    - 音声は Google Cloud Storage にアップロードされ、URI 指定で音声認識が行われます。
 3. `output/article.md` を開いて軽く校正。必要に応じて `raw_gpt_output.md` を参照
-4. `git add docs/site/article.md && git commit -m "first article" && git push`
+4. docs/site/ 以下を任意のサーバーへアップロードして公開
 
 ## 10. ローカル環境構築
 

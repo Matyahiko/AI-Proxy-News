@@ -1,6 +1,6 @@
 # AI Proxy News プロトタイプ
 
-このリポジトリは、透明性の高い AI 支援ニュースワークフローの最小プロトタイプです。短いインタビューを録音し、Google Speech-to-Text の長時間音声用 API で文字起こしを行い、Gemini API で要約と追加質問を生成した記事を GitHub Pages で公開することを目指します。
+このリポジトリは、透明性の高い AI 支援ニュースワークフローの最小プロトタイプです。短いインタビューを録音し、Google Speech-to-Text の長時間音声用 API で文字起こしを行い、Gemini API で要約と追加質問を生成した記事を 静的サイトとして保存し、任意の方法で公開できるようにします。
 
 詳細な設計は `docs/spec/design.md`、手順は `docs/spec/workflow.md` を参照してください。
 
@@ -34,7 +34,7 @@ docker run --rm -it \
   ai-proxy-news bash scripts/run_demo.sh data/record.mp3
 ```
 
-生成された `docs/site/article.md` をコミットして GitHub Pages へ公開してください。
+生成された `docs/site/article.md` をコミットし、静的サイトとして任意の方法で公開してください。
 
 ## ローカルでデモサイトを表示する
 
