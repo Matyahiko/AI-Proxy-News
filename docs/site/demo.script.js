@@ -1,5 +1,7 @@
 let transcriptSpans = [];
 let questionsShown = new Set();
+let ws = null;
+let recorder = null;
 
 window.addEventListener('DOMContentLoaded', () => {
     const video = document.getElementById('video-player');
@@ -45,6 +47,7 @@ window.addEventListener('DOMContentLoaded', () => {
 function setVideo(name) {
     const video = document.getElementById('video-player');
     video.src = '/data/' + name;
+    setupRealtime(video);
     const base = name.replace(/\.[^.]+$/, '');
     fetch('assets/data/' + base + '.json')
         .then(r => r.ok ? r.json() : null)
@@ -60,11 +63,60 @@ function setVideo(name) {
 function clearPanels() {
     const video = document.getElementById('video-player');
     video.ontimeupdate = null;
+    if (recorder) {
+        recorder.stop();
+        recorder = null;
+    }
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+    }
     transcriptSpans = [];
     questionsShown.clear();
     document.getElementById('transcript-area').innerHTML = '';
     document.getElementById('mock-questions-area').innerHTML = '';
     document.getElementById('questions-list').innerHTML = '';
+}
+
+function setupRealtime(video) {
+    video.onplay = () => {
+        if (ws && ws.readyState === WebSocket.OPEN) return;
+        ws = new WebSocket('ws://localhost:8765');
+        ws.onmessage = e => addTranscriptLine(e.data);
+        ws.onopen = () => startRecorder(video);
+    };
+    video.onpause = stopRecorder;
+    video.onended = stopRecorder;
+}
+
+function startRecorder(video) {
+    const stream = video.captureStream();
+    const audioStream = new MediaStream(stream.getAudioTracks());
+    recorder = new MediaRecorder(audioStream, {mimeType: 'audio/webm'});
+    recorder.ondataavailable = async e => {
+        if (e.data.size > 0 && ws && ws.readyState === WebSocket.OPEN) {
+            const buf = await e.data.arrayBuffer();
+            ws.send(buf);
+        }
+    };
+    recorder.start(1000);
+}
+
+function stopRecorder() {
+    if (recorder) {
+        recorder.stop();
+        recorder = null;
+    }
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send('EOS');
+    }
+}
+
+function addTranscriptLine(text) {
+    const area = document.getElementById('transcript-area');
+    const lines = area.textContent.split('\n').filter(l => l);
+    lines.push(text.trim());
+    while (lines.length > 5) lines.shift();
+    area.textContent = lines.join('\n');
 }
 
 function setupDemo(data) {

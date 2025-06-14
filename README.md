@@ -48,3 +48,15 @@ bash scripts/serve_docs.sh [ポート番号]
 ```
 
 ポート番号を省略すると `8000` で起動します。
+
+### リアルタイム文字起こしを試す
+
+別のターミナルで WebSocket サーバー `scripts/realtime_server.py` を起動すると、
+`demo.html` 再生時に動画の音声が Google Speech-to-Text へ送信され、右側の
+"リアルタイム文字起こし" パネルに逐次表示されます。
+
+```bash
+python3 scripts/realtime_server.py
+```
+
+`ASR_PORT` 環境変数で待ち受けポートを変更できます。

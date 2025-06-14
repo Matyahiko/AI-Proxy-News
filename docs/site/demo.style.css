@@ -68,6 +68,15 @@ h1 {
     background-color: yellow;
     color: black;
 }
+#transcript-area {
+    height: 6em;
+    overflow: hidden;
+    white-space: pre-line;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    font-size: 1rem;
+}
 #questions-list {
     list-style: none;
     padding: 0;
@@ -105,6 +114,9 @@ body.dark .tab-button.active {
 body.dark .current-transcript {
     background-color: #f90;
     color: #000;
+}
+body.dark #transcript-area {
+    background-color: #222;
 }
 body.dark #left-column,
 body.dark #right-column,
