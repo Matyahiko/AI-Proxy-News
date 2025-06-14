@@ -1,17 +1,29 @@
 let transcriptSpans = [];
 let questionsShown = new Set();
-let questionsData = [];
 
 window.addEventListener('DOMContentLoaded', () => {
-    fetch('/assets/data/kaiken.json').then(r => r.json()).then(setupDemo);
+    const video = document.getElementById('video-player');
+    const btnContainer = document.getElementById('video-buttons');
 
-    document.querySelectorAll('.video-selector').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.video-selector').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            fetch(btn.dataset.src).then(r => r.json()).then(setupDemo);
+    fetch('assets/data/video_list.json')
+        .then(r => r.json())
+        .then(list => {
+            list.forEach((name, idx) => {
+                const btn = document.createElement('button');
+                btn.textContent = name;
+                btn.className = 'video-selector';
+                btnContainer.appendChild(btn);
+                if (idx === 0) {
+                    btn.classList.add('active');
+                    setVideo(name);
+                }
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.video-selector').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    setVideo(name);
+                });
+            });
         });
-    });
 
     document.querySelectorAll('.tab-button').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -23,12 +35,35 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-function setupDemo(data) {
+function setVideo(name) {
     const video = document.getElementById('video-player');
-    video.src = data.videoUrl;
+    video.src = '/data/' + name;
+    const base = name.replace(/\.[^.]+$/, '');
+    fetch('assets/data/' + base + '.json')
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+            if (data) {
+                setupDemo(data);
+            } else {
+                clearPanels();
+            }
+        });
+}
+
+function clearPanels() {
+    const video = document.getElementById('video-player');
+    video.ontimeupdate = null;
     transcriptSpans = [];
     questionsShown.clear();
-    questionsData = data.questions;
+    document.getElementById('transcript-area').innerHTML = '';
+    document.getElementById('mock-questions-area').innerHTML = '';
+    document.getElementById('questions-list').innerHTML = '';
+}
+
+function setupDemo(data) {
+    const video = document.getElementById('video-player');
+    transcriptSpans = [];
+    questionsShown.clear();
 
     const tArea = document.getElementById('transcript-area');
     tArea.innerHTML = '';
