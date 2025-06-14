@@ -75,8 +75,8 @@ gs://<bucket>/record.wav
 /output/summary.md
 /output/follow_up.md
 /output/article.md           (summary + Qs + appendix)
-/docs/ (gh‑pages branch) ──┐
-                           └─ article.md
+/docs/site/ (gh‑pages branch) ──┐
+                                └─ article.md
 ```
 
 ## 7. プロンプト設計（日本語）
@@ -102,7 +102,7 @@ gs://<bucket>/record.wav
 2. `bash scripts/run_demo.sh data/record.mp3` を実行
    - 音声は Google Cloud Storage にアップロードされ、URI 指定で音声認識が行われます。
 3. `output/article.md` を開いて軽く校正。必要に応じて `raw_gpt_output.md` を参照
-4. `git add docs/article.md && git commit -m "first article" && git push`
+4. `git add docs/site/article.md && git commit -m "first article" && git push`
 
 ## 10. ローカル環境構築
 

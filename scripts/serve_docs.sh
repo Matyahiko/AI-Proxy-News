@@ -3,7 +3,7 @@ set -euo pipefail
 
 PORT="${1:-8000}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-DOCS_DIR="${SCRIPT_DIR}/../docs"
+DOCS_DIR="${SCRIPT_DIR}/../docs/site"
 
 cd "$DOCS_DIR"
 echo "Serving demo site on http://localhost:${PORT}"
