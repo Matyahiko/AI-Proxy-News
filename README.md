@@ -35,3 +35,15 @@ docker run --rm -it \
 ```
 
 生成された `docs/article.md` をコミットして GitHub Pages へ公開してください。
+
+## ローカルでデモサイトを表示する
+
+`docs/` ディレクトリには、インタビュー動画のサンプルを使ったデモサイト
+(`demo.html`) が含まれています。以下のスクリプトで簡易 HTTP サーバーを起動し、
+ブラウザで `http://localhost:8000/demo.html` を開いて確認できます。
+
+```bash
+bash scripts/serve_docs.sh [ポート番号]
+```
+
+ポート番号を省略すると `8000` で起動します。
