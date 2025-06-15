@@ -9,17 +9,22 @@ from google.cloud import speech
 import websockets
 
 load_dotenv(os.path.join('secrets', '.env'))
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
+
+level_name = os.environ.get('LOG_LEVEL', 'INFO').upper()
+level = getattr(logging, level_name, logging.INFO)
+logging.basicConfig(level=level, format='%(asctime)s %(levelname)s %(message)s')
+logger = logging.getLogger(__name__)
 
 PORT = int(os.environ.get('ASR_PORT', '9000'))
 
 async def handle(websocket):
-    logging.info('Client connected')
+    logger.info('Client connected')
     client = speech.SpeechClient()
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
         sample_rate_hertz=48000,
         language_code='ja-JP',
+        audio_channel_count=1,
     )
     streaming_config = speech.StreamingRecognitionConfig(
         config=config,
@@ -40,11 +45,11 @@ async def handle(websocket):
         try:
             async for message in websocket:
                 if isinstance(message, bytes):
-                    logging.info('Received %d bytes', len(message))
+                    logger.debug('Received %d bytes', len(message))
                     q.put(message)
                 else:
                     if message == 'EOS':
-                        logging.info('Received EOS')
+                        logger.debug('Received EOS')
                         break
         finally:
             q.put(None)
@@ -60,10 +65,10 @@ async def handle(websocket):
                     if not result.alternatives:
                         continue
                     text = result.alternatives[0].transcript
-                    logging.info('Recognized: %s', text)
+                    logger.info('Recognized: %s', text)
                     asyncio.run_coroutine_threadsafe(websocket.send(text), loop)
         except Exception as e:
-            logging.exception('Recognition error: %s', e)
+            logger.exception('Recognition error: %s', e)
         
 
 
