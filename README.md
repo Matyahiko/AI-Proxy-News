@@ -59,6 +59,10 @@ bash scripts/serve_docs.sh [ポート番号]
 python3 scripts/realtime_server.py
 ```
 
+このデモでは、動画の音声を WebM/Opus (48 kHz, 2ch) として
+Google Speech-to-Text へ送信します。`GOOGLE_APPLICATION_CREDENTIALS`
+環境変数など、認証情報の設定も忘れずに行ってください。
+
 `ASR_PORT` 環境変数で待ち受けポートを変更できます。
 
 #### Docker コンテナで同時に起動する

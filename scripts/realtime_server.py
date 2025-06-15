@@ -12,13 +12,14 @@ load_dotenv(os.path.join('secrets', '.env'))
 PORT = int(os.environ.get('ASR_PORT', '7001'))
 
 async def handle(websocket):
+    print('Client connected')
     client = speech.SpeechClient()
     # MediaRecorder in the demo captures audio as WebM/Opus at 48 kHz.
     # Configure the recognizer to accept that format directly.
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
-        # When using WEBM_OPUS, do not set sample_rate_hertz so Google can
-        # automatically detect the correct rate from the container.
+        sample_rate_hertz=48000,
+        audio_channel_count=2,
         language_code='ja-JP',
     )
     streaming_config = speech.StreamingRecognitionConfig(
@@ -46,6 +47,7 @@ async def handle(websocket):
                         break
         finally:
             q.put(None)
+            print('Client disconnected')
 
     def process():
         try:
