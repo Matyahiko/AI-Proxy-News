@@ -2,6 +2,7 @@ let transcriptSpans = [];
 let questionsShown = new Set();
 let ws = null;
 let recorder = null;
+let audioCtx = null;
 
 window.addEventListener('DOMContentLoaded', () => {
     const video = document.getElementById('video-player');
@@ -91,9 +92,17 @@ function setupRealtime(video) {
 function startRecorder(video) {
     const stream = video.captureStream();
     const audioStream = new MediaStream(stream.getAudioTracks());
+    // Use an AudioContext to ensure the sample rate is 48 kHz so that
+    // Google Speech-to-Text accepts the WebM/Opus stream.
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+        sampleRate: 48000
+    });
+    const source = audioCtx.createMediaStreamSource(audioStream);
+    const dest = audioCtx.createMediaStreamDestination();
+    source.connect(dest);
     // Capture audio using Opus so the server can forward it directly
     // to Google Speech-to-Text with WEBM_OPUS encoding.
-    recorder = new MediaRecorder(audioStream, {mimeType: 'audio/webm;codecs=opus'});
+    recorder = new MediaRecorder(dest.stream, {mimeType: 'audio/webm;codecs=opus'});
     recorder.ondataavailable = async e => {
         if (e.data.size > 0 && ws && ws.readyState === WebSocket.OPEN) {
             const buf = await e.data.arrayBuffer();
@@ -107,6 +116,10 @@ function stopRecorder() {
     if (recorder) {
         recorder.stop();
         recorder = null;
+    }
+    if (audioCtx) {
+        audioCtx.close();
+        audioCtx = null;
     }
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send('EOS');

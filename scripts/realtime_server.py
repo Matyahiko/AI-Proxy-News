@@ -17,7 +17,8 @@ async def handle(websocket):
     # Configure the recognizer to accept that format directly.
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
-        sample_rate_hertz=48000,
+        # When using WEBM_OPUS, do not set sample_rate_hertz so Google can
+        # automatically detect the correct rate from the container.
         language_code='ja-JP',
     )
     streaming_config = speech.StreamingRecognitionConfig(
@@ -47,16 +48,21 @@ async def handle(websocket):
             q.put(None)
 
     def process():
-        responses = client.streaming_recognize(
-            config=streaming_config,
-            requests=request_gen(),
-        )
-        for response in responses:
-            for result in response.results:
-                if not result.alternatives:
-                    continue
-                text = result.alternatives[0].transcript
-                asyncio.run_coroutine_threadsafe(websocket.send(text), loop)
+        try:
+            responses = client.streaming_recognize(
+                config=streaming_config,
+                requests=request_gen(),
+            )
+            for response in responses:
+                for result in response.results:
+                    if not result.alternatives:
+                        continue
+                    text = result.alternatives[0].transcript
+                    asyncio.run_coroutine_threadsafe(
+                        websocket.send(text), loop
+                    )
+        except Exception as exc:
+            print('Speech API error:', exc)
 
     thread = threading.Thread(target=process, daemon=True)
     thread.start()
