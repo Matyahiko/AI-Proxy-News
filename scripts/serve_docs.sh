@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PORT="${1:-8000}"
+PORT="${1:-7000}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="${SCRIPT_DIR}/.."
 DOCS_DIR="${ROOT_DIR}/docs/site"
