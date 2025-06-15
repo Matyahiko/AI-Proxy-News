@@ -32,6 +32,8 @@ async def handle(websocket):
     loop = asyncio.get_event_loop()
 
     def request_gen():
+        # The first message must carry the streaming config.
+        yield speech.StreamingRecognizeRequest(streaming_config=streaming_config)
         while True:
             data = q.get()
             if data is None:
@@ -53,10 +55,8 @@ async def handle(websocket):
 
     def process():
         try:
-            responses = client.streaming_recognize(
-                config=streaming_config,
-                requests=request_gen(),
-            )
+            # Send the request stream which begins with the config message.
+            responses = client.streaming_recognize(requests=request_gen())
             for response in responses:
                 for result in response.results:
                     if not result.alternatives:
