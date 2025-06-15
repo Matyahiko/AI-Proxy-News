@@ -14,8 +14,8 @@ PORT = int(os.environ.get('ASR_PORT', '8765'))
 async def handle(websocket):
     client = speech.SpeechClient()
     config = speech.RecognitionConfig(
-        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=16000,
+        encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
+        sample_rate_hertz=48000,
         language_code='ja-JP',
     )
     streaming_config = speech.StreamingRecognitionConfig(
