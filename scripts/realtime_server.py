@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import asyncio
+import logging
 import os
 import queue
 import threading
@@ -9,18 +10,25 @@ import websockets
 
 load_dotenv(os.path.join('secrets', '.env'))
 
-PORT = int(os.environ.get('ASR_PORT', '8765'))
+level_name = os.environ.get('LOG_LEVEL', 'INFO').upper()
+level = getattr(logging, level_name, logging.INFO)
+logging.basicConfig(level=level, format='%(asctime)s %(levelname)s %(message)s')
+logger = logging.getLogger(__name__)
+
+PORT = int(os.environ.get('ASR_PORT', '9000'))
 
 async def handle(websocket):
+    logger.info('Client connected')
     client = speech.SpeechClient()
     config = speech.RecognitionConfig(
-        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=16000,
+        encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
+        sample_rate_hertz=48000,
         language_code='ja-JP',
+        audio_channel_count=2,
     )
     streaming_config = speech.StreamingRecognitionConfig(
         config=config,
-        interim_results=False,
+        interim_results=True,
     )
 
     q = queue.Queue()
@@ -37,24 +45,33 @@ async def handle(websocket):
         try:
             async for message in websocket:
                 if isinstance(message, bytes):
+                    logger.debug('Received %d bytes', len(message))
                     q.put(message)
                 else:
                     if message == 'EOS':
+                        logger.debug('Received EOS')
                         break
         finally:
             q.put(None)
 
     def process():
-        responses = client.streaming_recognize(
-            config=streaming_config,
-            requests=request_gen(),
-        )
-        for response in responses:
-            for result in response.results:
-                if not result.alternatives:
-                    continue
-                text = result.alternatives[0].transcript
-                asyncio.run_coroutine_threadsafe(websocket.send(text), loop)
+        try:
+            responses = client.streaming_recognize(
+                config=streaming_config,
+                requests=request_gen(),
+            )
+            for response in responses:
+                for result in response.results:
+                    if not result.alternatives:
+                        continue
+                    if result.is_final:
+                        text = result.alternatives[0].transcript.strip()
+                        logger.info('Recognized: %s', text)
+                        asyncio.run_coroutine_threadsafe(websocket.send(text), loop)
+        except Exception as e:
+            logger.exception('Recognition error: %s', e)
+        
+
 
     thread = threading.Thread(target=process, daemon=True)
     thread.start()
