@@ -80,7 +80,7 @@ function clearPanels() {
 function setupRealtime(video) {
     video.onplay = () => {
         if (ws && ws.readyState === WebSocket.OPEN) return;
-        ws = new WebSocket('ws://localhost:9000');
+        ws = new WebSocket('ws://localhost:7001');
         ws.onmessage = e => addTranscriptLine(e.data);
         ws.onopen = () => startRecorder(video);
     };
