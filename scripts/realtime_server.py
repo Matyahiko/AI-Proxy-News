@@ -27,7 +27,7 @@ async def handle(websocket):
     )
     streaming_config = speech.StreamingRecognitionConfig(
         config=config,
-        interim_results=False,
+        interim_results=True,
     )
 
     q = queue.Queue()
