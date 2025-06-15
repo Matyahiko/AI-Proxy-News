@@ -17,12 +17,10 @@ async def handle(websocket):
         print('Warning: GOOGLE_APPLICATION_CREDENTIALS not set')
     client = speech.SpeechClient()
     await websocket.send('READY')
-    # MediaRecorder in the demo captures audio as WebM/Opus at 48 kHz.
-    # Configure the recognizer to accept that format directly.
+    # MediaRecorder in the demo captures audio as WebM/Opus.
+    # The sample rate is detected automatically.
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
-        sample_rate_hertz=48000,
-        audio_channel_count=2,
         language_code='ja-JP',
     )
     streaming_config = speech.StreamingRecognitionConfig(
