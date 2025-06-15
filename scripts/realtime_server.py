@@ -9,9 +9,9 @@ from google.cloud import speech
 import websockets
 
 load_dotenv(os.path.join('secrets', '.env'))
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
 
-PORT = int(os.environ.get('ASR_PORT', '8765'))
+PORT = int(os.environ.get('ASR_PORT', '9000'))
 
 async def handle(websocket):
     logging.info('Client connected')
@@ -40,7 +40,7 @@ async def handle(websocket):
         try:
             async for message in websocket:
                 if isinstance(message, bytes):
-                    logging.debug('Received %d bytes', len(message))
+                    logging.info('Received %d bytes', len(message))
                     q.put(message)
                 else:
                     if message == 'EOS':
