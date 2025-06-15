@@ -32,6 +32,9 @@ async def handle(websocket):
     loop = asyncio.get_event_loop()
 
     def request_gen():
+        # The Google Speech API expects the streaming config as the first
+        # message in the request iterator.
+        yield speech.StreamingRecognizeRequest(streaming_config=streaming_config)
         while True:
             data = q.get()
             if data is None:
@@ -55,10 +58,9 @@ async def handle(websocket):
         try:
             # Provide the streaming config explicitly and send audio chunks
             # in the request iterator.
-            responses = client.streaming_recognize(
-                config=streaming_config,
-                requests=request_gen(),
-            )
+            # Initiate streaming recognition with the request iterator. The
+            # first request includes the streaming configuration.
+            responses = client.streaming_recognize(requests=request_gen())
             for response in responses:
                 for result in response.results:
                     if not result.alternatives:
