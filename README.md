@@ -63,6 +63,8 @@ python3 scripts/realtime_server.py
 Google Speech-to-Text へ送信します。`GOOGLE_APPLICATION_CREDENTIALS`
 環境変数など、認証情報の設定も忘れずに行ってください。
 接続後に "READY" メッセージが届いたら録音が開始されます。
+サーバーは JSON 形式で `{text, isFinal}` をブラウザへ送り、
+`isFinal` が `true` のとき確定字幕として表示されます。
 
 `ASR_PORT` 環境変数で待ち受けポートを変更できます。
 

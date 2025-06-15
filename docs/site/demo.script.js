@@ -2,6 +2,8 @@ let transcriptSpans = [];
 let questionsShown = new Set();
 let ws = null;
 let recorder = null;
+let interimEl = null;
+let finalList = null;
 
 window.addEventListener('DOMContentLoaded', () => {
     const video = document.getElementById('video-player');
@@ -78,6 +80,8 @@ function clearPanels() {
 }
 
 function setupRealtime(video) {
+    interimEl = document.getElementById('interim-text');
+    finalList = document.getElementById('final-transcript');
     video.onplay = () => {
         if (ws && ws.readyState === WebSocket.OPEN) return;
         ws = new WebSocket('ws://localhost:7001');
@@ -86,7 +90,7 @@ function setupRealtime(video) {
                 console.log('ASR server ready');
                 startRecorder(video);
             } else {
-                addTranscriptLine(e.data);
+                handleTranscript(JSON.parse(e.data));
             }
         };
     };
@@ -121,12 +125,16 @@ function stopRecorder() {
     console.log('Recorder stopped');
 }
 
-function addTranscriptLine(text) {
-    const area = document.getElementById('transcript-area');
-    const lines = area.textContent.split('\n').filter(l => l);
-    lines.push(text.trim());
-    while (lines.length > 5) lines.shift();
-    area.textContent = lines.join('\n');
+function handleTranscript(data) {
+    if (data.isFinal) {
+        const li = document.createElement('li');
+        li.textContent = data.text;
+        finalList.appendChild(li);
+        finalList.scrollTop = finalList.scrollHeight;
+        interimEl.textContent = '';
+    } else {
+        interimEl.textContent = data.text;
+    }
 }
 
 function setupDemo(data) {

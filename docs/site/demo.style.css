@@ -77,6 +77,19 @@ h1 {
     justify-content: flex-end;
     font-size: 1rem;
 }
+#interim-text {
+    color: #555;
+    font-style: italic;
+}
+#final-transcript {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+#final-transcript li {
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
 #questions-list {
     list-style: none;
     padding: 0;

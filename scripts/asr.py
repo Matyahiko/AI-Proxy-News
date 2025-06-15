@@ -22,21 +22,28 @@ src_path = sys.argv[1]
 output_path = sys.argv[2]
 print(f"[ASR] Transcribing '{src_path}'...")
 
+
 def convert_to_wav(path: str) -> str:
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
     tmp.close()
-    subprocess.run([
-        "ffmpeg",
-        "-y",
-        "-i",
-        path,
-        "-ar",
-        "16000",
-        "-ac",
-        "1",
-        tmp.name,
-    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-y",
+            "-i",
+            path,
+            "-ar",
+            "16000",
+            "-ac",
+            "1",
+            tmp.name,
+        ],
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
     return tmp.name
+
 
 use_path = src_path
 cleanup = False
