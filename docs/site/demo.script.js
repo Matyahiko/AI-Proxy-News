@@ -2,6 +2,8 @@ let transcriptSpans = [];
 let questionsShown = new Set();
 let ws = null;
 let recorder = null;
+let interimEl = null;
+let finalList = null;
 
 window.addEventListener('DOMContentLoaded', () => {
     const video = document.getElementById('video-player');
@@ -78,11 +80,19 @@ function clearPanels() {
 }
 
 function setupRealtime(video) {
+    interimEl = document.getElementById('interim-text');
+    finalList = document.getElementById('final-transcript');
     video.onplay = () => {
         if (ws && ws.readyState === WebSocket.OPEN) return;
         ws = new WebSocket('ws://localhost:7001');
-        ws.onmessage = e => addTranscriptLine(e.data);
-        ws.onopen = () => startRecorder(video);
+        ws.onmessage = e => {
+            if (e.data === 'READY') {
+                console.log('ASR server ready');
+                startRecorder(video);
+            } else {
+                handleTranscript(JSON.parse(e.data));
+            }
+        };
     };
     video.onpause = stopRecorder;
     video.onended = stopRecorder;
@@ -91,14 +101,17 @@ function setupRealtime(video) {
 function startRecorder(video) {
     const stream = video.captureStream();
     const audioStream = new MediaStream(stream.getAudioTracks());
-    recorder = new MediaRecorder(audioStream, {mimeType: 'audio/webm'});
+    // Record directly in WebM/Opus. The server will forward this stream
+    // to Google Speech-to-Text.
+    recorder = new MediaRecorder(audioStream, {mimeType: 'audio/webm;codecs=opus'});
     recorder.ondataavailable = async e => {
         if (e.data.size > 0 && ws && ws.readyState === WebSocket.OPEN) {
             const buf = await e.data.arrayBuffer();
             ws.send(buf);
         }
     };
-    recorder.start(1000);
+    console.log('Recorder started');
+    recorder.start(250);
 }
 
 function stopRecorder() {
@@ -109,14 +122,19 @@ function stopRecorder() {
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send('EOS');
     }
+    console.log('Recorder stopped');
 }
 
-function addTranscriptLine(text) {
-    const area = document.getElementById('transcript-area');
-    const lines = area.textContent.split('\n').filter(l => l);
-    lines.push(text.trim());
-    while (lines.length > 5) lines.shift();
-    area.textContent = lines.join('\n');
+function handleTranscript(data) {
+    if (data.isFinal) {
+        const li = document.createElement('li');
+        li.textContent = data.text;
+        finalList.appendChild(li);
+        finalList.scrollTop = finalList.scrollHeight;
+        interimEl.textContent = '';
+    } else {
+        interimEl.textContent = data.text;
+    }
 }
 
 function setupDemo(data) {
