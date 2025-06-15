@@ -13,9 +13,11 @@ PORT = int(os.environ.get('ASR_PORT', '7001'))
 
 async def handle(websocket):
     client = speech.SpeechClient()
+    # MediaRecorder in the demo captures audio as WebM/Opus at 48 kHz.
+    # Configure the recognizer to accept that format directly.
     config = speech.RecognitionConfig(
-        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=16000,
+        encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
+        sample_rate_hertz=48000,
         language_code='ja-JP',
     )
     streaming_config = speech.StreamingRecognitionConfig(

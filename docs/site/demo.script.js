@@ -91,7 +91,9 @@ function setupRealtime(video) {
 function startRecorder(video) {
     const stream = video.captureStream();
     const audioStream = new MediaStream(stream.getAudioTracks());
-    recorder = new MediaRecorder(audioStream, {mimeType: 'audio/webm'});
+    // Capture audio using Opus so the server can forward it directly
+    // to Google Speech-to-Text with WEBM_OPUS encoding.
+    recorder = new MediaRecorder(audioStream, {mimeType: 'audio/webm;codecs=opus'});
     recorder.ondataavailable = async e => {
         if (e.data.size > 0 && ws && ws.readyState === WebSocket.OPEN) {
             const buf = await e.data.arrayBuffer();
