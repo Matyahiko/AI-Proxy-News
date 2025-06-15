@@ -82,8 +82,14 @@ function setupRealtime(video) {
     video.onplay = () => {
         if (ws && ws.readyState === WebSocket.OPEN) return;
         ws = new WebSocket('ws://localhost:7001');
-        ws.onmessage = e => addTranscriptLine(e.data);
-        ws.onopen = () => startRecorder(video);
+        ws.onmessage = e => {
+            if (e.data === 'READY') {
+                console.log('ASR server ready');
+                startRecorder(video);
+            } else {
+                addTranscriptLine(e.data);
+            }
+        };
     };
     video.onpause = stopRecorder;
     video.onended = stopRecorder;
@@ -109,7 +115,8 @@ function startRecorder(video) {
             ws.send(buf);
         }
     };
-    recorder.start(1000);
+    console.log('Recorder started');
+    recorder.start(250);
 }
 
 function stopRecorder() {
@@ -124,6 +131,7 @@ function stopRecorder() {
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send('EOS');
     }
+    console.log('Recorder stopped');
 }
 
 function addTranscriptLine(text) {

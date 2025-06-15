@@ -13,7 +13,10 @@ PORT = int(os.environ.get('ASR_PORT', '7001'))
 
 async def handle(websocket):
     print('Client connected')
+    if not os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'):
+        print('Warning: GOOGLE_APPLICATION_CREDENTIALS not set')
     client = speech.SpeechClient()
+    await websocket.send('READY')
     # MediaRecorder in the demo captures audio as WebM/Opus at 48 kHz.
     # Configure the recognizer to accept that format directly.
     config = speech.RecognitionConfig(
@@ -41,6 +44,7 @@ async def handle(websocket):
         try:
             async for message in websocket:
                 if isinstance(message, bytes):
+                    print('Received chunk', len(message))
                     q.put(message)
                 else:
                     if message == 'EOS':
