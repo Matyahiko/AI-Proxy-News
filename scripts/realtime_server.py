@@ -24,11 +24,11 @@ async def handle(websocket):
         encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
         sample_rate_hertz=48000,
         language_code='ja-JP',
-        audio_channel_count=1,
+        audio_channel_count=2,
     )
     streaming_config = speech.StreamingRecognitionConfig(
         config=config,
-        interim_results=False,
+        interim_results=True,
     )
 
     q = queue.Queue()
@@ -64,9 +64,10 @@ async def handle(websocket):
                 for result in response.results:
                     if not result.alternatives:
                         continue
-                    text = result.alternatives[0].transcript
-                    logger.info('Recognized: %s', text)
-                    asyncio.run_coroutine_threadsafe(websocket.send(text), loop)
+                    if result.is_final:
+                        text = result.alternatives[0].transcript.strip()
+                        logger.info('Recognized: %s', text)
+                        asyncio.run_coroutine_threadsafe(websocket.send(text), loop)
         except Exception as e:
             logger.exception('Recognition error: %s', e)
         
