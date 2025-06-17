@@ -6,16 +6,7 @@ ASR_PORT="${2:-7001}"
 export ASR_PORT
 
 check_port() {
-  python3 - "$1" <<'EOF'
-import socket, sys
-port = int(sys.argv[1])
-s = socket.socket()
-try:
-    s.bind(("0.0.0.0", port))
-except OSError:
-    sys.exit(1)
-s.close()
-EOF
+  python3 scripts/utils.py check_port "$1"
 }
 
 if ! check_port "$DOCS_PORT"; then

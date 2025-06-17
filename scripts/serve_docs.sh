@@ -13,15 +13,7 @@ if [ ! -e "${DOCS_DIR}/data" ]; then
 fi
 
 # Generate a simple JSON listing of available video files
-python3 - "$DATA_DIR" "${DOCS_DIR}/assets/data/video_list.json" <<'EOF'
-import json, os, sys
-data_dir = sys.argv[1]
-out_path = sys.argv[2]
-videos = [f for f in os.listdir(data_dir)
-          if f.lower().endswith(('.mp4', '.mov', '.webm'))]
-with open(out_path, 'w', encoding='utf-8') as f:
-    json.dump(videos, f)
-EOF
+python3 scripts/utils.py generate_videos "$DATA_DIR" "${DOCS_DIR}/assets/data/video_list.json"
 
 cd "$DOCS_DIR"
 echo "Serving demo site on http://localhost:${PORT}/demo.html"
