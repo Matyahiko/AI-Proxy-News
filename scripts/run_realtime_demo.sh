@@ -1,27 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DOCS_PORT="${1:-12000}"
-ASR_PORT="${2:-12001}"
-export ASR_PORT
-
-check_port() {
-  python3 scripts/utils.py check_port "$1"
-}
-
-if ! check_port "$DOCS_PORT"; then
-  echo "Port $DOCS_PORT is already in use; specify another." >&2
-  exit 1
+# Set ports via environment variables if provided as arguments
+if [ $# -ge 1 ]; then
+  export DOCS_PORT="$1"
+fi
+if [ $# -ge 2 ]; then
+  export ASR_PORT="$2"
 fi
 
-if ! check_port "$ASR_PORT"; then
-  echo "Port $ASR_PORT is already in use; specify another." >&2
-  exit 1
-fi
+# Validate port availability using centralized config
+python3 -c "
+import sys
+sys.path.append('scripts')
+from config import validate_port_usage
+validate_port_usage()
+"
 
 python3 scripts/realtime_server.py &
 ASR_PID=$!
 
 trap 'kill $ASR_PID' EXIT
+
+# Get DOCS_PORT from config if not set
+DOCS_PORT=$(python3 -c "
+import sys
+sys.path.append('scripts')
+from config import get_docs_port
+print(get_docs_port())
+")
 
 bash scripts/serve_docs.sh "$DOCS_PORT"
