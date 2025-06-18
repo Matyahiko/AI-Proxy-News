@@ -14,7 +14,17 @@ cleanup() {
 # Set up signal handlers
 trap cleanup SIGINT SIGTERM EXIT
 
-PORT="${1:-12000}"
+# Get port from argument or config
+if [ $# -ge 1 ]; then
+  PORT="$1"
+else
+  PORT=$(python3 -c "
+import sys
+sys.path.append('scripts')  
+from config import get_docs_port
+print(get_docs_port())
+")
+fi
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="${SCRIPT_DIR}/.."
 DOCS_DIR="${ROOT_DIR}/docs/site"

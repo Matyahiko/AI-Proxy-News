@@ -35,7 +35,28 @@ docker-compose run --rm demo bash scripts/run_demo.sh data/record.mp3
 docker-compose logs -f
 ```
 
-### Docker Workflow (Legacy)
+### Local Development (Alternative)
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# List available Gemini models
+python3 scripts/list_models.py
+
+# Run main workflow locally
+bash scripts/run_demo.sh data/record.mp3
+
+# Serve demo site locally (default port 12000)
+bash scripts/serve_docs.sh [port]
+
+# Run realtime transcription server (port 12001 by default)
+python3 scripts/realtime_server.py
+
+# Run realtime demo with both web server and ASR server
+bash scripts/run_realtime_demo.sh [docs_port] [asr_port]
+```
+
+### Docker Workflow (Legacy - Use docker-compose instead)
 ```bash
 # Build Docker image (uses secrets/.env for PROXY if set)
 bash scripts/build_image.sh
@@ -52,24 +73,6 @@ docker run --rm -it \
   -v $(pwd):/app \
   --env-file secrets/.env \
   ai-proxy-news bash scripts/run_realtime_demo.sh
-```
-
-### Local Development
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# List available Gemini models
-python3 scripts/list_models.py
-
-# Run main workflow locally
-bash scripts/run_demo.sh data/record.mp3
-
-# Serve demo site locally (default port 12000)
-bash scripts/serve_docs.sh [port]
-
-# Run realtime transcription server (port 12001 by default)
-python3 scripts/realtime_server.py
 ```
 
 ## Configuration
@@ -106,3 +109,11 @@ All API keys and credentials are stored in `secrets/.env` (copy from `.env.examp
 - All intermediate outputs are preserved for transparency
 - The credo.json file defines the AI's editorial guidelines
 - Default ports are 12000 (HTTP) and 12001 (WebSocket) to avoid conflicts
+
+## Execution Methods
+
+**Recommended:** Use `docker-compose up --build` for integrated development with automatic service orchestration.
+
+**Alternative:** Use `bash scripts/run_realtime_demo.sh` for lightweight local development without Docker overhead.
+
+**Legacy:** Single Docker container approach is maintained for compatibility but not recommended for new development.
