@@ -80,7 +80,7 @@ function clearPanels() {
 function setupRealtime(video) {
     video.onplay = () => {
         if (ws && ws.readyState === WebSocket.OPEN) return;
-        ws = new WebSocket('ws://localhost:7001');
+        ws = new WebSocket('ws://localhost:7003');
         ws.onmessage = e => addTranscriptLine(e.data);
         ws.onopen = () => startRecorder(video);
     };
@@ -88,17 +88,63 @@ function setupRealtime(video) {
     video.onended = stopRecorder;
 }
 
-function startRecorder(video) {
-    const stream = video.captureStream();
-    const audioStream = new MediaStream(stream.getAudioTracks());
-    recorder = new MediaRecorder(audioStream, {mimeType: 'audio/webm'});
-    recorder.ondataavailable = async e => {
-        if (e.data.size > 0 && ws && ws.readyState === WebSocket.OPEN) {
-            const buf = await e.data.arrayBuffer();
-            ws.send(buf);
+async function startRecorder(video) {
+    try {
+        const stream = video.captureStream();
+        const audioStream = new MediaStream(stream.getAudioTracks());
+        
+        // AudioContextを作成
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)({
+            sampleRate: 16000
+        });
+        
+        // AudioWorkletを登録
+        await audioContext.audioWorklet.addModule('pcm-processor.js');
+        
+        // 音源を接続
+        const source = audioContext.createMediaStreamSource(audioStream);
+        const workletNode = new AudioWorkletNode(audioContext, 'pcm-processor');
+        
+        // PCMデータを受信してWebSocketに送信
+        workletNode.port.onmessage = (event) => {
+            if (event.data.type === 'pcm-data' && ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(event.data.data);
+            }
+        };
+        
+        // 音声処理チェインを接続
+        source.connect(workletNode);
+        workletNode.connect(audioContext.destination);
+        
+        // AudioContextを開始
+        if (audioContext.state === 'suspended') {
+            await audioContext.resume();
         }
-    };
-    recorder.start(1000);
+        
+        recorder = {
+            audioContext,
+            workletNode,
+            stop: () => {
+                source.disconnect();
+                workletNode.disconnect();
+                audioContext.close();
+            }
+        };
+        
+    } catch (error) {
+        console.error('Failed to start PCM recorder:', error);
+        // フォールバック：元のMediaRecorderを使用
+        const stream = video.captureStream();
+        const audioStream = new MediaStream(stream.getAudioTracks());
+        recorder = new MediaRecorder(audioStream, {mimeType: 'audio/webm'});
+        recorder.ondataavailable = async e => {
+            if (e.data.size > 0 && ws && ws.readyState === WebSocket.OPEN) {
+                const buf = await e.data.arrayBuffer();
+                ws.send(buf);
+            }
+        };
+        recorder.start(1000);
+    }
 }
 
 function stopRecorder() {
