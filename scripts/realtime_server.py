@@ -2,6 +2,7 @@
 import asyncio
 import logging
 import queue
+import signal
 import threading
 from typing import AsyncGenerator
 from google.cloud import speech
@@ -20,6 +21,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 PORT = get_asr_port()
+
+# Graceful shutdown event
+shutdown_event = asyncio.Event()
 
 class RequestGenerator:
     """Handles audio data streaming for Speech-to-Text API."""
@@ -106,15 +110,31 @@ async def send_result_safely(websocket, text: str):
     except websockets.exceptions.ConnectionClosed:
         pass
 
+def signal_handler(signum, frame):
+    """Handle shutdown signals."""
+    logger.info(f"Received signal {signum}, initiating graceful shutdown...")
+    shutdown_event.set()
+
 async def main():
     """Start the realtime ASR WebSocket server."""
+    # Set up signal handlers
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
     try:
-        async with websockets.serve(handle, '0.0.0.0', PORT, max_size=None):
+        async with websockets.serve(handle, '0.0.0.0', PORT, max_size=None) as server:
             logger.info(f'Realtime ASR server listening on ws://0.0.0.0:{PORT}')
-            await asyncio.Future()
+            logger.info('Press Ctrl+C to stop the server')
+            
+            # Wait for shutdown signal
+            await shutdown_event.wait()
+            logger.info("Shutting down server...")
+            
     except Exception as e:
         logger.error(f"Server error: {e}")
         raise
+    finally:
+        logger.info("Server stopped")
 
 if __name__ == '__main__':
     asyncio.run(main())
