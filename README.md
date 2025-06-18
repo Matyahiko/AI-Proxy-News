@@ -6,28 +6,60 @@
 
 API キーなどの認証情報は `secrets/.env` にまとめて保存してください。
 
-## Docker での実行
+## 実行方法
+
+### Docker Compose での実行（推奨）
 
 1. `.env.example` を参考に `secrets/.env` を作成し、API キーと `GCS_BUCKET` を記入します。
-2. 以下のコマンドでイメージをビルドします。 `secrets/.env` に `PROXY` を設定す
-   ると自動で利用されます。`docker build` だけでビルドする場合は
-   `--build-arg PROXY=<proxy-url>` を渡してください。
+2. 全サービスを起動します（Webサーバー: ポート12000、ASRサーバー: ポート12001）：
 
 ```bash
-bash scripts/build_image.sh
-# 例: プロキシを指定して直接ビルドする場合
-docker build --build-arg PROXY=http://example.com:8080 -t ai-proxy-news .
+# 全サービスを起動
+docker-compose up --build
+
+# バックグラウンドで起動
+docker-compose up -d --build
+
+# サービスを停止
+docker-compose down
 ```
-3. 任意で Gemini の利用可能なモデルを確認します。
+
+3. メインワークフローの実行：
 
 ```bash
+# 音声ファイルを処理してデモを実行
+docker-compose run --rm demo bash scripts/run_demo.sh data/record.mp3
+```
+
+### ローカル開発での実行
+
+```bash
+# 依存関係をインストール
+pip install -r requirements.txt
+
+# Gemini の利用可能なモデルを確認
 python3 scripts/list_models.py
+
+# メインワークフローを実行
+bash scripts/run_demo.sh data/record.mp3
+
+# デモサイトを起動（デフォルトポート12000）
+bash scripts/serve_docs.sh [port]
+
+# リアルタイム文字起こしサーバーを起動（ポート12001）
+python3 scripts/realtime_server.py
+
+# Webサーバーとリアルタイム文字起こしを同時起動
+bash scripts/run_realtime_demo.sh [docs_port] [asr_port]
 ```
 
-
-4. 音声ファイル `data/record.wav` や `data/record.mp3` などを用意し、次を実行してデモを開始します。音声は Google Cloud Storage にアップロードされ、URI で認識されます。
+### 従来のDocker実行（レガシー）
 
 ```bash
+# イメージをビルド
+bash scripts/build_image.sh
+
+# メインワークフローを実行
 docker run --rm -it \
   -v $(pwd):/app \
   --env-file secrets/.env \
@@ -36,18 +68,27 @@ docker run --rm -it \
 
 生成された `docs/site/article.md` をコミットし、静的サイトとして任意の方法で公開してください。
 
-## ローカルでデモサイトを表示する
+## デモサイトの表示
+
+### Docker Compose使用時
+
+```bash
+docker-compose up --build
+```
+
+起動後、ブラウザで `http://localhost:12000/demo.html` にアクセスしてください。
+
+### ローカル実行時
 
 `docs/site/` ディレクトリにはデモ用の `demo.html` が含まれています。
 `scripts/serve_docs.sh` を実行すると、プロジェクトルートの `data/` ディレクトリ
-にある動画ファイルを自動で読み込み、簡易 HTTP サーバーを起動します。ブラウザで
-`http://localhost:7000/demo.html` を開いて確認できます。
+にある動画ファイルを自動で読み込み、簡易 HTTP サーバーを起動します。
 
 ```bash
 bash scripts/serve_docs.sh [ポート番号]
 ```
 
-ポート番号を省略すると `7000` で起動します。
+ポート番号を省略すると `12000` で起動します。ブラウザで `http://localhost:12000/demo.html` を開いて確認できます。
 
 ### リアルタイム文字起こしを試す
 
@@ -59,21 +100,20 @@ bash scripts/serve_docs.sh [ポート番号]
 python3 scripts/realtime_server.py
 ```
 
-`ASR_PORT` 環境変数で待ち受けポートを変更できます。
+`ASR_PORT` 環境変数で待ち受けポートを変更できます（デフォルト: 12001）。
 
-#### Docker コンテナで同時に起動する
+#### 従来のDockerコンテナで同時に起動する
 
 HTTP サーバーとリアルタイム文字起こしサーバーを一度に立ち上げたい場合は、
-`scripts/run_realtime_demo.sh` を実行します。デフォルトではポート `7000` と
-`7001` を使用しますが、引数で変更可能です。ポートを開けておくとブラウザから
-<http://localhost:7000/demo.html> にアクセスできます。
+`scripts/run_realtime_demo.sh` を実行します。デフォルトではポート `12000` と
+`12001` を使用しますが、引数で変更可能です。
 
 ```bash
 docker run --rm -it \
-  -p 7000:7000 -p 7001:7001 \
+  -p 12000:12000 -p 12001:12001 \
   -v $(pwd):/app \
   --env-file secrets/.env \
-  ai-proxy-news bash scripts/run_realtime_demo.sh
+  ai-proxy-news bash scripts/run_realtime_demo.sh 12000 12001
 ```
 
 ポートを変更したい場合は、スクリプトの引数として指定します。例えば
