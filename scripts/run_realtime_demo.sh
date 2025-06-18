@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DOCS_PORT="${1:-7000}"
-ASR_PORT="${2:-7001}"
+DOCS_PORT="${1:-12000}"
+ASR_PORT="${2:-12001}"
 export ASR_PORT
 
 check_port() {

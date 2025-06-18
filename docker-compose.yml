@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "${DOCS_PORT:-12000}:7000"
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - ASR_PORT=12001
+    env_file:
+      - secrets/.env
+    command: bash scripts/serve_docs.sh 7000
+    depends_on:
+      - asr
+
+  asr:
+    build: .
+    ports:
+      - "${ASR_PORT:-12001}:7001"
+    volumes:
+      - .:/app
+    working_dir: /app
+    env_file:
+      - secrets/.env
+    command: python3 scripts/realtime_server.py
+
+  demo:
+    build: .
+    volumes:
+      - .:/app
+    working_dir: /app
+    env_file:
+      - secrets/.env
+    command: bash
+    profiles:
+      - demo

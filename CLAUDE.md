@@ -17,7 +17,25 @@ The system follows a linear pipeline:
 
 ## Development Commands
 
-### Docker Workflow (Primary)
+### Docker Compose Workflow (Primary)
+```bash
+# Start all services (web: port 12000, asr: port 12001)
+docker-compose up --build
+
+# Start in background
+docker-compose up -d --build
+
+# Stop services
+docker-compose down
+
+# Run main demo workflow
+docker-compose run --rm demo bash scripts/run_demo.sh data/record.mp3
+
+# View logs
+docker-compose logs -f
+```
+
+### Docker Workflow (Legacy)
 ```bash
 # Build Docker image (uses secrets/.env for PROXY if set)
 bash scripts/build_image.sh
@@ -30,7 +48,7 @@ docker run --rm -it \
 
 # Run realtime demo with web server
 docker run --rm -it \
-  -p 7000:7000 -p 7001:7001 \
+  -p 12000:7000 -p 12001:7001 \
   -v $(pwd):/app \
   --env-file secrets/.env \
   ai-proxy-news bash scripts/run_realtime_demo.sh
@@ -47,10 +65,10 @@ python3 scripts/list_models.py
 # Run main workflow locally
 bash scripts/run_demo.sh data/record.mp3
 
-# Serve demo site locally (default port 7000)
+# Serve demo site locally (default port 12000)
 bash scripts/serve_docs.sh [port]
 
-# Run realtime transcription server (port 7001 by default)
+# Run realtime transcription server (port 12001 by default)
 python3 scripts/realtime_server.py
 ```
 
@@ -61,7 +79,8 @@ All API keys and credentials are stored in `secrets/.env` (copy from `.env.examp
 - `GEMINI_API_KEY`: Google Gemini API key
 - `GCS_BUCKET`: Google Cloud Storage bucket for audio uploads
 - `PROXY`: Optional proxy URL for Docker builds
-- `ASR_PORT`: WebSocket port for realtime transcription (default 7001)
+- `ASR_PORT`: WebSocket port for realtime transcription (default 12001)
+- `DOCS_PORT`: HTTP port for demo site (default 12000)
 
 ## Key Components
 
@@ -86,4 +105,4 @@ All API keys and credentials are stored in `secrets/.env` (copy from `.env.examp
 - Audio files are uploaded to GCS for Speech-to-Text processing
 - All intermediate outputs are preserved for transparency
 - The credo.json file defines the AI's editorial guidelines
-- Default ports are 7000 (HTTP) and 7001 (WebSocket) to avoid conflicts
+- Default ports are 12000 (HTTP) and 12001 (WebSocket) to avoid conflicts

@@ -41,4 +41,4 @@ def validate_gemini_config():
 
 def get_asr_port():
     """Get ASR WebSocket port with default."""
-    return int(get_optional_env("ASR_PORT", "7001"))
+    return int(get_optional_env("ASR_PORT", "12001"))
